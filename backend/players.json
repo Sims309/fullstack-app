@@ -1,0 +1,18 @@
+[
+    {
+        "name": "Manuel Neuer",
+        "position": "GK",
+        "rating": 90,
+        "image_url": "https://example.com/neuer.jpg",
+        "biography": "Gardien allemand légendaire du Bayern Munich.",
+        "statistics": "Clean sheets: 250+"
+    },
+    {
+        "name": "Lionel Messi",
+        "position": "RW",
+        "rating": 93,
+        "image_url": "https://example.com/messi.jpg",
+        "biography": "Légende argentine de l'Inter Miami.",
+        "statistics": "Buts: 800+, Passes: 300+"
+    }
+]

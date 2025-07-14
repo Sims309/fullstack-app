@@ -1,0 +1,43 @@
+{
+    "name": "fullstack-app",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+        "backend",
+        "frontend",
+        "shared"
+    ],
+    "scripts": {
+        "install": "npm install --workspaces",
+        "build": "npm run build --workspaces",
+        "build:backend": "npm --workspace=backend run build",
+        "build:frontend": "npm --workspace=frontend run build",
+        "build:shared": "npm --workspace=shared run build",
+        "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+        "start:backend": "npm --workspace=backend run start",
+        "start:frontend": "npm --workspace=frontend run start",
+        "lint": "eslint './**/*.{ts,tsx,js,jsx}'",
+        "test": "npm run test --workspaces",
+        "clean": "rimraf dist && rimraf backend/dist && rimraf frontend/build"
+    },
+    "devDependencies": {
+        "concurrently": "^8.0.0",
+        "eslint": "^8.0.0",
+        "rimraf": "^5.0.0",
+        "tsconfig-paths": "^4.2.0",
+        "typescript": "^5.0.0"
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "dependencies": {
+        "@types/jsonwebtoken": "^9.0.10",
+        "jsonwebtoken": "^9.0.2"
+    },
+    "main": "index.js",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "commonjs",
+    "description": ""
+}

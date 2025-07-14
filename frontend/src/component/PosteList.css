@@ -1,0 +1,53 @@
+/* PosteList.css */
+
+.poste-container {
+  padding: 2rem;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card img {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.stats {
+  text-align: left;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.bio {
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+.poste-loading,
+.poste-error,
+.poste-empty {
+  color: #ff5252;
+  font-weight: bold;
+  padding: 2rem;
+}

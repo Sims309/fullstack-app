@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": "src",
+    "outDir": "../dist/frontend"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../shared" }
+  ]
+}
