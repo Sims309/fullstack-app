@@ -1,9 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Defender_1 = require("@shared/Defender");
+// Update the import path if the file is named differently or located elsewhere
+// Example: import { joueursParPoste, Player } from '../../shared/defenders';
+// Make sure the file '../../shared/defender.ts' exists and exports 'joueursParPoste' and 'Player'
+const defender_1 = require("../../shared/defender");
 async function runDiagnostic() {
     try {
-        const ailiersDroits = Defender_1.joueursParPoste.ailiersDroits;
+        const ailiersDroits = defender_1.joueursParPoste.ailiersDroits;
         ailiersDroits.forEach((player) => {
             console.log(`✅ Joueur: ${player.name} (${player.club})`);
         });

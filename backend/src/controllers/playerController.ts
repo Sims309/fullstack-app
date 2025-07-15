@@ -1,10 +1,10 @@
-// controllers/playerController.ts
+// fullstack-app/backend/src/controllers/playerController.ts
+
 import { Request, Response } from 'express';
 import { db } from '../db';
-// import { mapSqlRowToJoueur, Joueur } from '../models/joueurModel'; // Tu peux commenter ou supprimer si tu ne l'utilises plus
 
-// Import de l'interface depuis le dossier partagé
-import { MilieuDefensif } from '@shared/interfaces/MilieuDefensif';
+// ✅ Type bien importé depuis shared/types
+import type { MilieuDefensif } from '@shared/types/milieuxDefensifs';
 
 export const getJoueurById = (req: Request, res: Response) => {
   const joueurId = Number(req.params.id);
@@ -15,31 +15,66 @@ export const getJoueurById = (req: Request, res: Response) => {
     if (err) return res.status(500).json({ error: 'Erreur serveur.' });
     if (results.length === 0) return res.status(404).json({ error: 'Milieu défensif non trouvé.' });
 
-    // Ici on cast le résultat en MilieuDefensif (attention à la correspondance des champs en base)
     const joueur: MilieuDefensif = {
       id: results[0].id,
-      nom: results[0].nom,
-      pays: results[0].pays,
+      posteId: results[0].posteId,
+      name: results[0].name,
+      country: results[0].country,
       image: results[0].image,
-      pointsFIFA: results[0].pointsFIFA,
+      fifa_points: results[0].fifa_points,
+      biography: results[0].biography,
+      statistics: results[0].statistics,
+      trophees_majeurs: results[0].trophees_majeurs,
+      age: results[0].age,
+      club: results[0].club,
+      nationalite: results[0].nationalite,
+      buts: results[0].buts,
+      passes: results[0].passes,
+      cartons_jaunes: results[0].cartons_jaunes,
+      cartons_rouges: results[0].cartons_rouges
     };
     res.json({ joueur });
   });
 };
 
 export const createJoueur = (req: Request, res: Response) => {
-  const { nom, pays, image, pointsFIFA } = req.body;
+  const {
+    posteId,
+    name,
+    country,
+    image,
+    fifa_points,
+    biography,
+    statistics,
+    trophees_majeurs,
+    age,
+    club,
+    nationalite,
+    buts,
+    passes,
+    cartons_jaunes,
+    cartons_rouges
+  } = req.body;
 
-  // Vérifie que les champs nécessaires à MilieuDefensif sont présents
-  if (!nom || !pays || !image || pointsFIFA === undefined) {
+  if (
+    !posteId || !name || !country || !image || fifa_points === undefined || !biography || !statistics ||
+    !trophees_majeurs || age === undefined || !club || !nationalite ||
+    buts === undefined || passes === undefined || cartons_jaunes === undefined || cartons_rouges === undefined
+  ) {
     return res.status(400).json({ error: 'Tous les champs sont requis.' });
   }
 
-  // Prépare l'objet MilieuDefensif
-  const nouveauMilieuDefensif: MilieuDefensif = { nom, pays, image, pointsFIFA };
+  const sql = `
+    INSERT INTO milieux_defensifs (
+      posteId, name, country, image, fifa_points, biography, statistics,
+      trophees_majeurs, age, club, nationalite, buts, passes, cartons_jaunes, cartons_rouges
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
 
-  const sql = 'INSERT INTO milieux_defensifs (nom, pays, image, pointsFIFA) VALUES (?, ?, ?, ?)';
-  db.query(sql, [nouveauMilieuDefensif.nom, nouveauMilieuDefensif.pays, nouveauMilieuDefensif.image, nouveauMilieuDefensif.pointsFIFA], (err, result: any) => {
+  db.query(sql, [
+    posteId, name, country, image, fifa_points, biography, statistics,
+    trophees_majeurs, age, club, nationalite, buts, passes, cartons_jaunes, cartons_rouges
+  ], (err, result: any) => {
     if (err) return res.status(500).json({ error: 'Erreur lors de la création du milieu défensif.' });
     res.status(201).json({ message: 'Milieu défensif créé.', joueurId: result.insertId });
   });

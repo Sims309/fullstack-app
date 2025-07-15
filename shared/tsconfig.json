@@ -3,8 +3,9 @@
   "compilerOptions": {
     "composite": true,
     "declaration": true,
-    "rootDir": "types",          // ✅ Ici on précise le bon répertoire
+    "rootDir": "./",
     "outDir": "../dist/shared"
   },
-  "include": ["types"]
+  "include": ["**/*"],
+  "exclude": ["../dist", "node_modules"]
 }

@@ -4,10 +4,14 @@
     "composite": true,
     "rootDir": "src",
     "outDir": "../dist/backend",
-    "baseUrl": ".",
-    "tsBuildInfoFile": "../dist/backend/tsconfig.backend.tsbuildinfo"
+    "tsBuildInfoFile": "../dist/backend/tsconfig.backend.tsbuildinfo",
+
+    // 👇 Ajout essentiel pour que TS trouve tes types perso
+    "typeRoots": ["./src/server/types", "../../node_modules/@types"]
   },
   "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "../dist"],
   "references": [
+    { "path": "../shared" }
   ]
 }

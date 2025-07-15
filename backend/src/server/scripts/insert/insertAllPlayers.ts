@@ -1,23 +1,21 @@
-import { db } from '../../config/db';
-import { joueursParPoste, Player } from '../../../../shared/types/Defender';
+import { db } from '../../../db'; // ✅ chemin corrigé
+import { joueursParPoste, Joueur } from '@shared/types/joueurs'; // ✅ chemin partagé
 
-// Mappage poste ↔ code court + ID
 const positions: { [key: string]: { label: string; id: number } } = {
   gardiens: { label: 'GK', id: 1 },
   defenseursCentraux: { label: 'DEF', id: 2 },
-  arrieresGauche: { label: 'DEF', id: 3 },
-  arrieresDroits: { label: 'DEF', id: 4 },
+  defenseursGauches: { label: 'DEF', id: 3 },
+  defenseursDroits: { label: 'DEF', id: 4 },
   milieuxDefensifs: { label: 'MID', id: 5 },
-  milieuxCentraux: { label: 'MID', id: 6 },
+  milieuxRelayeurs: { label: 'MID', id: 6 },
   milieuxOffensifs: { label: 'MID', id: 7 },
-  ailiersGauche: { label: 'ATT', id: 8 },
+  ailiersGauches: { label: 'ATT', id: 8 },
   ailiersDroits: { label: 'ATT', id: 9 },
-  attaquants: { label: 'ATT', id: 10 },
-  secondsAttaquants: { label: 'ATT', id: 11 },
+  attaquantsDeSoutien: { label: 'ATT', id: 10 },
+  buteurs: { label: 'ATT', id: 11 },
 };
 
-// Fonction générique d’insertion
-const insertPlayers = (players: Player[], positionLabel: string, positionId: number) => {
+const insertPlayers = (players: Joueur[], positionLabel: string, positionId: number) => {
   players.forEach((player) => {
     const sql = `
       REPLACE INTO players (
@@ -47,9 +45,9 @@ const insertPlayers = (players: Player[], positionLabel: string, positionId: num
       positionId,
     ];
 
-    db.query(sql, values, (err) => {
-      if (err) {
-        console.error(`❌ Erreur pour ${player.name} (${positionLabel}) :`, err);
+    db.query(sql, values, (err: unknown) => {
+      if (err instanceof Error) {
+        console.error(`❌ Erreur pour ${player.name} (${positionLabel}) :`, err.message);
       } else {
         console.log(`✅ Joueur inséré : ${player.name} (${positionLabel})`);
       }
@@ -57,12 +55,11 @@ const insertPlayers = (players: Player[], positionLabel: string, positionId: num
   });
 };
 
-// Boucle sur tous les postes
 Object.entries(joueursParPoste).forEach(([poste, joueurs]) => {
   const positionInfo = positions[poste];
   if (!positionInfo) {
     console.warn(`⚠️ Poste non reconnu : ${poste}`);
     return;
   }
-  insertPlayers(Player, positionInfo.label, positionInfo.id);
+  insertPlayers(joueurs, positionInfo.label, positionInfo.id);
 });

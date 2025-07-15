@@ -2,7 +2,7 @@
 // scripts/insert/insertMilieuxOffensifs.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = require("../../db");
-const Defender_1 = require("../../../../shared/types/Defender");
+const Defender_1 = require("../../shared/types/Defender");
 const insertArrieresGauche = () => {
     Defender_1.arrieresGauche.forEach((player) => {
         const sql = `

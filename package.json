@@ -2,6 +2,20 @@
     "name": "fullstack-app",
     "version": "1.0.0",
     "private": true,
+    "description": "",
+    "keywords": [],
+    "homepage": "https://github.com/Sims309/fullstack-app#readme",
+    "bugs": {
+        "url": "https://github.com/Sims309/fullstack-app/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://Sims309@github.com/Sims309/fullstack-app.git"
+    },
+    "license": "ISC",
+    "author": "",
+    "type": "commonjs",
+    "main": "index.js",
     "workspaces": [
         "backend",
         "frontend",
@@ -20,6 +34,10 @@
         "test": "npm run test --workspaces",
         "clean": "rimraf dist && rimraf backend/dist && rimraf frontend/build"
     },
+    "dependencies": {
+        "@types/jsonwebtoken": "^9.0.10",
+        "jsonwebtoken": "^9.0.2"
+    },
     "devDependencies": {
         "concurrently": "^8.0.0",
         "eslint": "^8.0.0",
@@ -29,15 +47,5 @@
     },
     "engines": {
         "node": ">=18"
-    },
-    "dependencies": {
-        "@types/jsonwebtoken": "^9.0.10",
-        "jsonwebtoken": "^9.0.2"
-    },
-    "main": "index.js",
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "type": "commonjs",
-    "description": ""
+    }
 }

@@ -1,15 +1,16 @@
 {
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "references": [
+    { "path": "./shared" },
+    { "path": "./backend" },
+    { "path": "./frontend" }
+  ],
   "compilerOptions": {
-    "target": "es2020",
-    "module": "commonjs",
-    "baseUrl": "./backend/src",
+    "composite": true,
+    "baseUrl": ".",
     "paths": {
       "@shared/*": ["shared/*"]
-    },
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "include": ["backend/src/**/*"]
+    }
+  }
 }

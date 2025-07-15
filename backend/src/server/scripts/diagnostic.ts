@@ -1,4 +1,7 @@
-import { joueursParPoste, Player } from '@shared/Defender';
+// fullstack-app/backend/src/server/scripts/diagnostic.ts
+
+// ✅ Import mis à jour vers le bon fichier partagé
+import { joueursParPoste, Joueur as Player } from '@shared/types/joueurs';
 
 async function runDiagnostic() {
   try {
@@ -9,7 +12,7 @@ async function runDiagnostic() {
     });
 
     // Simule une opération async qui peut échouer
-    await new Promise((resolve, reject) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     console.log('Diagnostic terminé avec succès.');
 
   } catch (error: unknown) {

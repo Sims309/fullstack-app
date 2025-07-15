@@ -2,9 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 // scripts/insert/insertSecondsAttaquants.ts
 const { db } = require('../../config/db');
-const Defender_1 = require("../../../../shared/types/Defender");
+// Update the import path below to the correct location of secondsAttaquants
+// Example: import { secondsAttaquants } from '../../../../shared/data/secondsAttaquants';
+const secondsAttaquants_1 = require("../../../../shared/data/secondsAttaquants");
 const insertSecondsAttaquants = () => {
-    Defender_1.secondsAttaquants.forEach((player) => {
+    secondsAttaquants_1.secondsAttaquants.forEach((player) => {
         const sql = `
       REPLACE INTO players (
         id, name, country, image, fifa_points, biography, statistics, trophees_majeurs,

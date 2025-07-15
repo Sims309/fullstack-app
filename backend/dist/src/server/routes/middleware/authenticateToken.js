@@ -8,17 +8,15 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    if (!token)
+    if (!token) {
         return res.status(401).json({ error: 'Token manquant' });
-    jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || 'secret', (err, user) => {
-        if (err)
-            return res.status(403).json({ error: 'Token invalide' });
-        // Ici on vérifie si user est bien un objet, pas une string
-        if (typeof user === 'string') {
-            // Si c'est une string, on refuse ou on parse en objet selon ta logique
-            return res.status(403).json({ error: 'Token invalide' });
-        }
-        req.user = user;
+    }
+    try {
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
         next();
-    });
+    }
+    catch (err) {
+        return res.status(403).json({ error: 'Token invalide' });
+    }
 }
