@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
+    "clean": "rimraf ../dist/backend",
     "build": "tsc -p tsconfig.node.json",
+    "rebuild": "npm run clean && npm run build",
     "start": "node ../dist/backend/index.js",
     "dev": "nodemon -r ts-node/register -r tsconfig-paths/register src/index.ts",
     "watch": "nodemon --exec ts-node src/index.ts"
@@ -40,6 +42,7 @@
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "rimraf": "^5.0.0"
   }
 }
