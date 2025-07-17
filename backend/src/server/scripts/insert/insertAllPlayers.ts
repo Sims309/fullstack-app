@@ -1,5 +1,6 @@
-import { db } from '../../../db'; // ✅ chemin corrigé
-import { joueursParPoste, Joueur } from '@shared/types/joueurs'; // ✅ chemin partagé
+// src/scripts/insertAllPlayers.ts
+import { db } from '../../../db';
+import { joueursParPoste, Joueur } from '@shared/types/joueurs';
 
 const positions: { [key: string]: { label: string; id: number } } = {
   gardiens: { label: 'GK', id: 1 },
@@ -15,8 +16,13 @@ const positions: { [key: string]: { label: string; id: number } } = {
   buteurs: { label: 'ATT', id: 11 },
 };
 
-const insertPlayers = (players: Joueur[], positionLabel: string, positionId: number) => {
-  players.forEach((player) => {
+// 🔁 Fonction asynchrone pour insérer les joueurs
+const insertPlayers = async (
+  players: Joueur[],
+  positionLabel: string,
+  positionId: number
+) => {
+  for (const player of players) {
     const sql = `
       REPLACE INTO players (
         id, name, country, image, fifa_points, biography, statistics, trophees_majeurs,
@@ -28,38 +34,45 @@ const insertPlayers = (players: Joueur[], positionLabel: string, positionId: num
     const values = [
       player.id,
       player.name,
-      player.country,
-      player.image,
-      player.fifa_points,
-      player.biography,
-      player.statistics,
-      player.trophees_majeurs,
-      player.age,
-      player.club,
-      player.nationalite,
-      player.buts,
-      player.passes,
-      player.cartons_jaunes,
-      player.cartons_rouges,
+      player.country || null,
+      player.image || null,
+      player.fifa_points || 0,
+      player.biography || null,
+      player.statistics || null,
+      player.trophees_majeurs || null,
+      player.age || null,
+      player.club || null,
+      player.nationalite || null,
+      player.buts || 0,
+      player.passes || 0,
+      player.cartons_jaunes || 0,
+      player.cartons_rouges || 0,
       positionLabel,
       positionId,
     ];
 
-    db.query(sql, values, (err: unknown) => {
-      if (err instanceof Error) {
-        console.error(`❌ Erreur pour ${player.name} (${positionLabel}) :`, err.message);
-      } else {
-        console.log(`✅ Joueur inséré : ${player.name} (${positionLabel})`);
-      }
-    });
-  });
+    try {
+      await db.query(sql, values);
+      console.log(`✅ Joueur inséré : ${player.name} (${positionLabel})`);
+    } catch (err) {
+      console.error(`❌ Erreur pour ${player.name} (${positionLabel}) :`, (err as Error).message);
+    }
+  }
 };
 
-Object.entries(joueursParPoste).forEach(([poste, joueurs]) => {
-  const positionInfo = positions[poste];
-  if (!positionInfo) {
-    console.warn(`⚠️ Poste non reconnu : ${poste}`);
-    return;
+// 🚀 Fonction principale d’insertion globale
+const run = async () => {
+  for (const [poste, joueurs] of Object.entries(joueursParPoste)) {
+    const positionInfo = positions[poste];
+    if (!positionInfo) {
+      console.warn(`⚠️ Poste non reconnu : ${poste}`);
+      continue;
+    }
+
+    await insertPlayers(joueurs, positionInfo.label, positionInfo.id);
   }
-  insertPlayers(joueurs, positionInfo.label, positionInfo.id);
+};
+
+run().catch((err) => {
+  console.error('❌ Erreur globale dans insertAllPlayers:', err);
 });

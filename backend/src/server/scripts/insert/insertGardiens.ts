@@ -1,16 +1,17 @@
+// src/scripts/insertGardiens.ts
 import { db } from '../../../db';
 import { gardiens, type Joueur } from '@shared/types/joueurs';
 
-const insertGardiens = (): void => {
+const insertGardiens = async (): Promise<void> => {
   if (!gardiens || gardiens.length === 0) {
     console.log("⚠️ Aucun gardien trouvé à insérer");
     return;
   }
 
-  gardiens.forEach((player: Joueur) => {
+  for (const player of gardiens) {
     if (!player.id || !player.name) {
       console.error(`❌ Données manquantes pour le joueur:`, player);
-      return;
+      continue;
     }
 
     const sql = `
@@ -40,18 +41,23 @@ const insertGardiens = (): void => {
       player.posteId || 1 // posteId = 1 pour les gardiens
     ];
 
-    db.query(sql, values, (err: Error | null) => {
-      if (err) {
-        console.error(`❌ Erreur lors de l'insertion du gardien ${player.name}:`, err.message);
-      } else {
-        console.log(`✅ Gardien inséré avec succès : ${player.name}`);
-      }
-    });
-  });
+    try {
+      await db.execute(sql, values);
+      console.log(`✅ Gardien inséré avec succès : ${player.name}`);
+    } catch (err) {
+      console.error(`❌ Erreur lors de l'insertion du gardien ${player.name}:`, (err as Error).message);
+    }
+  }
 };
 
-try {
-  insertGardiens();
-} catch (error) {
-  console.error("❌ Erreur lors de l'exécution de insertGardiens:", error);
-}
+const run = async () => {
+  try {
+    await insertGardiens();
+  } catch (error) {
+    console.error("❌ Erreur lors de l'exécution de insertGardiens:", error);
+  } finally {
+    await db.end(); // 🔐 fermeture propre du pool MySQL
+  }
+};
+
+run();
