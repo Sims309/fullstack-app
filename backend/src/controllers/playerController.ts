@@ -1,19 +1,22 @@
-// fullstack-app/backend/src/controllers/playerController.ts
-
 import { Request, Response } from 'express';
 import { db } from '../db';
-
-// ✅ Type bien importé depuis shared/types
+import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 import type { MilieuDefensif } from '@shared/types/milieuxDefensifs';
 
-export const getJoueurById = (req: Request, res: Response) => {
+export const getJoueurById = async (req: Request, res: Response) => {
   const joueurId = Number(req.params.id);
-  if (isNaN(joueurId)) return res.status(400).json({ error: 'ID invalide' });
+  if (isNaN(joueurId)) {
+    return res.status(400).json({ error: 'ID invalide' });
+  }
 
   const sql = 'SELECT * FROM milieux_defensifs WHERE id = ? LIMIT 1';
-  db.query(sql, [joueurId], (err, results: any[]) => {
-    if (err) return res.status(500).json({ error: 'Erreur serveur.' });
-    if (results.length === 0) return res.status(404).json({ error: 'Milieu défensif non trouvé.' });
+
+  try {
+    const [results] = await db.query<RowDataPacket[]>(sql, [joueurId]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Milieu défensif non trouvé.' });
+    }
 
     const joueur: MilieuDefensif = {
       id: results[0].id,
@@ -33,11 +36,15 @@ export const getJoueurById = (req: Request, res: Response) => {
       cartons_jaunes: results[0].cartons_jaunes,
       cartons_rouges: results[0].cartons_rouges
     };
+
     res.json({ joueur });
-  });
+  } catch (err) {
+    console.error('❌ Erreur serveur (getJoueurById):', (err as Error).message);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
 };
 
-export const createJoueur = (req: Request, res: Response) => {
+export const createJoueur = async (req: Request, res: Response) => {
   const {
     posteId,
     name,
@@ -71,11 +78,15 @@ export const createJoueur = (req: Request, res: Response) => {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [
-    posteId, name, country, image, fifa_points, biography, statistics,
-    trophees_majeurs, age, club, nationalite, buts, passes, cartons_jaunes, cartons_rouges
-  ], (err, result: any) => {
-    if (err) return res.status(500).json({ error: 'Erreur lors de la création du milieu défensif.' });
+  try {
+    const [result] = await db.query<ResultSetHeader>(sql, [
+      posteId, name, country, image, fifa_points, biography, statistics,
+      trophees_majeurs, age, club, nationalite, buts, passes, cartons_jaunes, cartons_rouges
+    ]);
+
     res.status(201).json({ message: 'Milieu défensif créé.', joueurId: result.insertId });
-  });
+  } catch (err) {
+    console.error('❌ Erreur serveur (createJoueur):', (err as Error).message);
+    res.status(500).json({ error: 'Erreur lors de la création du milieu défensif.' });
+  }
 };
