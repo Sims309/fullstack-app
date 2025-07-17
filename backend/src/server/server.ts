@@ -1,3 +1,4 @@
+// src/server/server.ts
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -47,7 +48,7 @@ app.get('/api/protected', authenticateToken, (req: Request, res: Response) => {
 });
 
 // ✅ Infos utilisateur connecté
-app.get('/api/me', authenticateToken, (req: Request, res: Response) => {
+app.get('/api/me', authenticateToken, async (req: Request, res: Response) => {
   const userId = req.user?.userId;
 
   if (!userId) {
@@ -56,18 +57,18 @@ app.get('/api/me', authenticateToken, (req: Request, res: Response) => {
 
   const sql = 'SELECT id, email, username, role FROM users WHERE id = ? LIMIT 1';
 
-  db.query(sql, [userId], (err: Error | null, results: any[]) => {
-    if (err) {
-      logger.error('Erreur lors de la récupération de l\'utilisateur:', err);
-      return res.status(500).json({ error: 'Erreur serveur.' });
-    }
+  try {
+    const [results] = await db.query(sql, [userId]);
 
-    if (results.length === 0) {
+    if ((results as any[]).length === 0) {
       return res.status(404).json({ error: 'Utilisateur non trouvé.' });
     }
 
-    res.json({ user: results[0] });
-  });
+    res.json({ user: (results as any[])[0] });
+  } catch (err) {
+    logger.error('Erreur lors de la récupération de l\'utilisateur:', err);
+    res.status(500).json({ error: 'Erreur serveur.' });
+  }
 });
 
 // ✅ Ping de santé
@@ -77,6 +78,18 @@ app.get('/api/health', (_req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
     version: '1.0.0',
   });
+});
+
+// ✅ Route temporaire pour tester la base de données
+app.get('/api/test-db', async (_req: Request, res: Response) => {
+  try {
+    const [results] = await db.query('SELECT 1 AS test');
+    console.log('✅ Requête test réussie :', results);
+    res.json({ success: true, result: results });
+  } catch (err) {
+    console.error('❌ Erreur de requête test DB :', err);
+    res.status(500).json({ error: 'Erreur base de données' });
+  }
 });
 
 export default app;

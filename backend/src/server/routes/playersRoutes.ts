@@ -1,11 +1,11 @@
 import express, { Request, Response } from 'express';
 import { db } from '../../db';
 import { authenticateToken } from './middleware/authMiddleware';
+import type { RowDataPacket } from 'mysql2';
 
 const router = express.Router();
 
-// Interface pour les joueurs
-interface Player {
+interface Player extends RowDataPacket {
   id: number;
   name: string;
   position: string;
@@ -15,30 +15,24 @@ interface Player {
   statistics?: string;
 }
 
-// GET /api/players - Récupérer tous les joueurs
-router.get('/', authenticateToken, (req: Request, res: Response) => {
-  const sql = 'SELECT * FROM players ORDER BY rating DESC';
-
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error('Erreur lors de la récupération des joueurs:', err);
-      return res.status(500).json({ error: 'Erreur serveur lors de la récupération des joueurs.' });
-    }
-    
-    // caster le résultat en Player[]
+router.get('/', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const [results] = await db.query<RowDataPacket[]>('SELECT * FROM players ORDER BY rating DESC');
     const players = results as Player[];
     res.json({ players });
-  });
+  } catch (err) {
+    console.error('Erreur récupération joueurs:', err);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
 });
 
-// GET /api/players/position/:position - Récupérer les joueurs par poste
-router.get('/position/:position', authenticateToken, (req: Request, res: Response) => {
+router.get('/position/:position', authenticateToken, async (req: Request, res: Response) => {
   const { position } = req.params;
 
-  const positionMapping: { [key: string]: string } = {
+  const positionMapping: Record<string, string> = {
     '1': 'Gardien',
     '2': 'Défenseur droit',
-    '3': 'Défenseur gauche', 
+    '3': 'Défenseur gauche',
     '4': 'Défenseur central',
     '5': 'Milieu défensif',
     '6': 'Milieu central',
@@ -47,74 +41,57 @@ router.get('/position/:position', authenticateToken, (req: Request, res: Respons
     '9': 'Ailier gauche',
     '10': 'Attaquant',
     '11': 'Buteur',
-    '12': 'Polyvalent'
+    '12': 'Polyvalent',
   };
 
   const positionName = positionMapping[position];
-
   if (!positionName) {
     return res.status(400).json({ error: 'Position invalide.' });
   }
 
-  const sql = 'SELECT * FROM players WHERE position = ? ORDER BY rating DESC LIMIT 10';
-
-  db.query(sql, [positionName], (err, results) => {
-    if (err) {
-      console.error('Erreur lors de la récupération des joueurs par poste:', err);
-      return res.status(500).json({ error: 'Erreur serveur lors de la récupération des joueurs.' });
-    }
-
+  try {
+    const [results] = await db.query<RowDataPacket[]>('SELECT * FROM players WHERE position = ? ORDER BY rating DESC LIMIT 10', [positionName]);
     const players = results as Player[];
     res.json({ players, position: positionName });
-  });
+  } catch (err) {
+    console.error('Erreur récupération par poste:', err);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
 });
 
-// GET /api/players/:id - Récupérer un joueur spécifique
-router.get('/:id', authenticateToken, (req: Request, res: Response) => {
+router.get('/:id', authenticateToken, async (req: Request, res: Response) => {
   const { id } = req.params;
-
   if (!id || isNaN(Number(id))) {
-    return res.status(400).json({ error: 'ID de joueur invalide.' });
+    return res.status(400).json({ error: 'ID invalide.' });
   }
 
-  const sql = 'SELECT * FROM players WHERE id = ? LIMIT 1';
-
-  db.query(sql, [id], (err, results) => {
-    if (err) {
-      console.error('Erreur lors de la récupération du joueur:', err);
-      return res.status(500).json({ error: 'Erreur serveur lors de la récupération du joueur.' });
-    }
-
+  try {
+    const [results] = await db.query<RowDataPacket[]>('SELECT * FROM players WHERE id = ? LIMIT 1', [id]);
     const players = results as Player[];
-
     if (players.length === 0) {
       return res.status(404).json({ error: 'Joueur non trouvé.' });
     }
-
     res.json({ player: players[0] });
-  });
+  } catch (err) {
+    console.error('Erreur récupération joueur:', err);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
 });
 
-// GET /api/players/top/:limit - Récupérer le top N des joueurs
-router.get('/top/:limit', authenticateToken, (req: Request, res: Response) => {
-  const { limit } = req.params;
-  const limitNum = Number(limit);
-
-  if (!limitNum || limitNum <= 0 || limitNum > 100) {
-    return res.status(400).json({ error: 'Limite invalide (doit être entre 1 et 100).' });
+router.get('/top/:limit', authenticateToken, async (req: Request, res: Response) => {
+  const limit = Number(req.params.limit);
+  if (!limit || limit <= 0 || limit > 100) {
+    return res.status(400).json({ error: 'Limite invalide (1-100).' });
   }
 
-  const sql = 'SELECT * FROM players ORDER BY rating DESC LIMIT ?';
-
-  db.query(sql, [limitNum], (err, results) => {
-    if (err) {
-      console.error('Erreur lors de la récupération du top joueurs:', err);
-      return res.status(500).json({ error: 'Erreur serveur lors de la récupération des joueurs.' });
-    }
-
+  try {
+    const [results] = await db.query<RowDataPacket[]>('SELECT * FROM players ORDER BY rating DESC LIMIT ?', [limit]);
     const players = results as Player[];
     res.json({ players });
-  });
+  } catch (err) {
+    console.error('Erreur récupération top joueurs:', err);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
 });
 
 export default router;
