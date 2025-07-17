@@ -36,21 +36,13 @@ app.use((0, cookie_parser_1.default)());
 app.use('/api/auth', authRoutes_1.default);
 app.use('/api/players', playersRoutes_1.default);
 app.use('/api/joueurs', joueurRoutes_1.default);
-// Route protégée simple - utilisez Request normal
+// ✅ Route protégée
 app.get('/api/protected', authMiddleware_1.authenticateToken, (req, res) => {
     res.json({ message: 'Route protégée accessible' });
 });
-// Route pour obtenir les informations de l'utilisateur connecté
+// ✅ Infos utilisateur connecté
 app.get('/api/me', authMiddleware_1.authenticateToken, (req, res) => {
-    let userId;
-    if (typeof req.user === 'string') {
-        // If user is a string (e.g., JWT decoded as string), treat as userId
-        userId = req.user;
-    }
-    else if (req.user && typeof req.user === 'object' && 'userId' in req.user) {
-        // If user is JwtPayload, extract userId
-        userId = req.user.userId;
-    }
+    const userId = req.user?.userId;
     if (!userId) {
         return res.status(400).json({ error: 'Utilisateur non identifié' });
     }
@@ -66,6 +58,7 @@ app.get('/api/me', authMiddleware_1.authenticateToken, (req, res) => {
         res.json({ user: results[0] });
     });
 });
+// ✅ Ping de santé
 app.get('/api/health', (_req, res) => {
     res.json({
         status: 'OK',

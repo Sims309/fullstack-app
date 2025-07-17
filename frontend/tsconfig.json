@@ -16,7 +16,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
-    "declaration": true
+    "declaration": true,
+    "declarationMap": true,             // ✅ Pour navigation dans IDE
+    "emitDeclarationOnly": false        // ✅ Pour éviter de n’avoir que les .d.ts
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "../dist"],

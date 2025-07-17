@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2020",
     "module": "commonjs",
-    "rootDir": ".",
+    "rootDir": "..",                     // 🔧 MODIFIÉ ICI
     "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
@@ -10,7 +10,9 @@
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["../shared/*"]
-    }
+    },
+    "types": ["node"],
+    "typeRoots": ["../node_modules/@types"]
   },
   "include": [
     "src/**/*",

@@ -1,12 +1,12 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "dist/server.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.node.json",
-    "start": "node dist/server.js",
-    "dev": "nodemon -r ts-node/register -r tsconfig-paths/register src/server/server.ts",
-    "watch": "nodemon --exec ts-node src/server/server.ts"
+    "start": "node ../dist/backend/index.js",
+    "dev": "nodemon -r ts-node/register -r tsconfig-paths/register src/index.ts",
+    "watch": "nodemon --exec ts-node src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -35,11 +35,11 @@
     "@types/helmet": "^0.0.48",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^24.0.12",
+    "@types/node": "^24.0.14",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.8.3",
-    "ts-node-dev": "^2.0.0"
+    "typescript": "^5.8.3"
   }
 }

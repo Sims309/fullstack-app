@@ -1,5 +1,4 @@
 "use strict";
-// controllers/userController.ts
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -8,8 +7,7 @@ exports.getJoueurById = exports.getCurrentUser = exports.logoutUser = exports.lo
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = require("../db");
-const userModel_1 = require("../models/userModel");
-const joueurModel_1 = require("../models/joueurModel");
+const joueurs_1 = require("@shared/types/joueurs");
 const JWT_SECRET = process.env.JWT_SECRET || 'secretkey';
 const registerUser = async (req, res) => {
     const { email, password, username } = req.body;
@@ -63,6 +61,7 @@ const logoutUser = (_req, res) => {
     res.json({ message: 'Déconnecté' });
 };
 exports.logoutUser = logoutUser;
+// ✅ Ici on garde la signature d’origine, avec le bon type enrichi
 const getCurrentUser = (req, res) => {
     const payload = req.user;
     if (!payload || typeof payload.userId !== 'number') {
@@ -75,7 +74,7 @@ const getCurrentUser = (req, res) => {
             return res.status(500).json({ error: 'Erreur serveur.' });
         if (results.length === 0)
             return res.status(404).json({ error: 'Utilisateur non trouvé.' });
-        const user = (0, userModel_1.mapSqlRowToUser)(results[0]);
+        const user = results[0];
         res.json({ user });
     });
 };
@@ -90,7 +89,7 @@ const getJoueurById = (req, res) => {
             return res.status(500).json({ error: 'Erreur serveur.' });
         if (results.length === 0)
             return res.status(404).json({ error: 'Joueur non trouvé.' });
-        const joueur = (0, joueurModel_1.mapSqlRowToJoueur)(results[0]);
+        const joueur = (0, joueurs_1.mapSqlRowToJoueur)(results[0]);
         res.json({ joueur });
     });
 };

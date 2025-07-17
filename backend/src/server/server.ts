@@ -41,42 +41,36 @@ app.use('/api/auth', authRoutes);
 app.use('/api/players', playersRoutes);
 app.use('/api/joueurs', joueurRoutes);
 
-// Route protégée simple - utilisez Request normal
+// ✅ Route protégée
 app.get('/api/protected', authenticateToken, (req: Request, res: Response) => {
   res.json({ message: 'Route protégée accessible' });
 });
 
-// Route pour obtenir les informations de l'utilisateur connecté
+// ✅ Infos utilisateur connecté
 app.get('/api/me', authenticateToken, (req: Request, res: Response) => {
-  let userId: string | undefined;
-  if (typeof req.user === 'string') {
-    // If user is a string (e.g., JWT decoded as string), treat as userId
-    userId = req.user;
-  } else if (req.user && typeof req.user === 'object' && 'userId' in req.user) {
-    // If user is JwtPayload, extract userId
-    userId = (req.user as any).userId;
-  }
+  const userId = req.user?.userId;
 
   if (!userId) {
     return res.status(400).json({ error: 'Utilisateur non identifié' });
   }
 
   const sql = 'SELECT id, email, username, role FROM users WHERE id = ? LIMIT 1';
-  
-  db.query(sql, [userId], (err: any, results: any[]) => {
+
+  db.query(sql, [userId], (err: Error | null, results: any[]) => {
     if (err) {
       logger.error('Erreur lors de la récupération de l\'utilisateur:', err);
       return res.status(500).json({ error: 'Erreur serveur.' });
     }
-    
+
     if (results.length === 0) {
       return res.status(404).json({ error: 'Utilisateur non trouvé.' });
     }
-    
+
     res.json({ user: results[0] });
   });
 });
 
+// ✅ Ping de santé
 app.get('/api/health', (_req: Request, res: Response) => {
   res.json({
     status: 'OK',

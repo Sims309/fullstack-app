@@ -1,3 +1,16 @@
+# Dépendances
 node_modules/
-dist/
+
+# Build (on ignore tout sauf les .gitkeep)
+dist/*
+!dist/.gitkeep
+!dist/backend/.gitkeep
+!dist/frontend/.gitkeep
+
+# Env
 .env
+
+# JS/TS build output
+**/*.js
+**/*.js.map
+**/*.d.ts

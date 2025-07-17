@@ -1,0 +1,10 @@
+# Dépendances et compilation
+node_modules/
+dist/
+
+# Env
+.env
+
+# Fichiers temporaires
+*.log
+*.tsbuildinfo

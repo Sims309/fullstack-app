@@ -1,17 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = require("../../../db");
-const Defender_1 = require("../../../../../shared/types/Defender");
-// If Player is not exported from there, create or export it accordingly.
-// If the file is named differently, update accordingly.
+const joueurs_1 = require("@shared/types/joueurs");
 const insertGardiens = () => {
-    const { gardiens } = Defender_1.joueursParPoste;
-    if (!gardiens || gardiens.length === 0) {
+    if (!joueurs_1.gardiens || joueurs_1.gardiens.length === 0) {
         console.log("⚠️ Aucun gardien trouvé à insérer");
         return;
     }
-    gardiens.forEach((player) => {
-        // Validation des données obligatoires
+    joueurs_1.gardiens.forEach((player) => {
         if (!player.id || !player.name) {
             console.error(`❌ Données manquantes pour le joueur:`, player);
             return;
@@ -19,9 +15,9 @@ const insertGardiens = () => {
         const sql = `
       REPLACE INTO players (
         id, name, country, image, fifa_points, biography, statistics, trophees_majeurs,
-        age, club, nationalite, buts, passes, cartons_jaunes, cartons_rouges, position, position_id
+        age, club, nationalite, buts, passes, cartons_jaunes, cartons_rouges, position, posteId
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'GK', 1)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'GK', ?)
     `;
         const values = [
             player.id,
@@ -39,6 +35,7 @@ const insertGardiens = () => {
             player.passes || 0,
             player.cartons_jaunes || 0,
             player.cartons_rouges || 0,
+            player.posteId || 1 // posteId = 1 pour les gardiens
         ];
         db_1.db.query(sql, values, (err) => {
             if (err) {
@@ -50,7 +47,6 @@ const insertGardiens = () => {
         });
     });
 };
-// Gestion des erreurs globales
 try {
     insertGardiens();
 }
