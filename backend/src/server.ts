@@ -1,4 +1,4 @@
-// src/server/server.ts
+// src/server.ts
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -7,23 +7,24 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 
-import authRoutes from './routes/authRoutes';
-import playersRoutes from './routes/playersRoutes';
-import joueurRoutes from './routes/joueurRoutes';
-import { authenticateToken } from './routes/middleware/authMiddleware';
-import { db } from '../db';
+import authRoutes from './server/routes/authRoutes';
+import playersRoutes from './server/routes/playersRoutes';
+import joueurRoutes from './server/routes/joueurRoutes';
+import { authenticateToken } from './server/routes/middleware/authMiddleware';
 
-import logger from './logger';
+import { db } from './db';
+import logger from './server/logger';
 
 dotenv.config();
 
-const app = express();
+// ✅ Export nommé pour pouvoir l'utiliser dans index.ts
+export const app = express();
 
 app.use(helmet());
 app.use(morgan('dev'));
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 100,
   message: 'Trop de requêtes, réessayez plus tard.',
 });
@@ -66,7 +67,7 @@ app.get('/api/me', authenticateToken, async (req: Request, res: Response) => {
 
     res.json({ user: (results as any[])[0] });
   } catch (err) {
-    logger.error('Erreur lors de la récupération de l\'utilisateur:', err);
+    logger.error("Erreur lors de la récupération de l'utilisateur:", err);
     res.status(500).json({ error: 'Erreur serveur.' });
   }
 });
@@ -80,7 +81,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 });
 
-// ✅ Route temporaire pour tester la base de données
+// ✅ Test DB
 app.get('/api/test-db', async (_req: Request, res: Response) => {
   try {
     const [results] = await db.query('SELECT 1 AS test');
@@ -91,5 +92,3 @@ app.get('/api/test-db', async (_req: Request, res: Response) => {
     res.status(500).json({ error: 'Erreur base de données' });
   }
 });
-
-export default app;

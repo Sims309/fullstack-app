@@ -6,14 +6,14 @@
     "outDir": "../dist/backend",
     "tsBuildInfoFile": "../dist/backend/tsconfig.backend.tsbuildinfo",
 
-    // ✅ Supprimer typeRoots pour éviter l’erreur
-    // "typeRoots": ["./src/server/types", "../../node_modules/@types"],
-
-    // ✅ Déclarer uniquement ce que tu veux charger
     "types": ["node"],
-
     "moduleResolution": "node",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+
+    "baseUrl": "..",                      // <-- Important : baseUrl est le dossier parent (fullstack-app/)
+    "paths": {
+      "@shared/*": ["shared/*"]          // <-- Résolution alias @shared/* vers dossier shared/
+    }
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "../dist"],

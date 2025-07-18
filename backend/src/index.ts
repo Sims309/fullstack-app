@@ -1,16 +1,15 @@
-// src/index.ts
+// backend/src/index.ts
 import dotenv from 'dotenv';
-import app from './server/server';
+import { app } from './server'; // ✅ Import du `app` nommé
 import { db } from './db';
 
 dotenv.config();
 
 const PORT: number = parseInt(process.env.PORT || '5000', 10);
 
-// ✅ Vérifier la connexion à MySQL AVANT de démarrer le serveur
 async function startServer() {
   try {
-    await db.getConnection(); // Essaie d’obtenir une connexion
+    await db.getConnection();
     console.log('✅ Connexion à MySQL réussie');
 
     app.listen(PORT, () => {
@@ -18,7 +17,7 @@ async function startServer() {
     });
   } catch (error) {
     console.error('❌ Échec de connexion à MySQL:', error);
-    process.exit(1); // Quitte le processus si la BDD est inaccessible
+    process.exit(1);
   }
 }
 
