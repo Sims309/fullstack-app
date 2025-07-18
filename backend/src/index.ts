@@ -1,6 +1,5 @@
-// backend/src/index.ts
 import dotenv from 'dotenv';
-import { app } from './server'; // ✅ Import du `app` nommé
+import { app } from './server'; // <-- CORRECT
 import { db } from './db';
 
 dotenv.config();
