@@ -2,21 +2,36 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
-    "rootDir": "src",
+    "rootDir": ".",
     "outDir": "../dist/backend",
     "tsBuildInfoFile": "../dist/backend/tsconfig.backend.tsbuildinfo",
 
-    "types": ["node"],
+    "types": ["node", "jest"],
     "moduleResolution": "node",
     "esModuleInterop": true,
 
-    "baseUrl": "..",                      // <-- Important : baseUrl est le dossier parent (fullstack-app/)
+    // ✅ baseUrl pointé vers ./src pour les imports internes à backend
+    "baseUrl": "./src",
+
+    // ✅ alias d'import avec résolution relative à ./src
     "paths": {
-      "@shared/*": ["shared/*"]          // <-- Résolution alias @shared/* vers dossier shared/
+      "@routes/*": ["routes/*"],
+      "@middleware/*": ["routes/middleware/*"],
+      "@utils/*": ["utils/*"],
+      
+      // ✅ alias vers le dossier partagé (en dehors de backend)
+      "@shared/*": ["../shared/*"]
     }
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "../dist"],
+  "include": [
+    "src/**/*.ts",
+    "scripts/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "../dist"
+  ],
   "references": [
     { "path": "../shared" }
   ]
