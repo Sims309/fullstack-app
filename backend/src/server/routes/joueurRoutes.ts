@@ -1,6 +1,8 @@
 // routes/joueurRoutes.ts
 import express from 'express';
-import { createJoueur, getJoueurById } from '../../controllers/controller';
+import { createJoueur, getJoueurById } from '@/controllers/joueurController';
+
+
 
 const router = express.Router();
 

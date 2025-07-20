@@ -33,21 +33,26 @@
         "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
         "dev:backend": "npm --workspace=backend run dev",
         "dev:frontend": "npm --workspace=frontend run dev",
-        "lint": "eslint './**/*.{ts,tsx,js,jsx}'",
-        "test": "npm run test --workspaces",
+        "test": "concurrently \"npm --workspace=backend run test\" \"npm --workspace=frontend run test\"",
+        "test:backend": "npx jest --config backend/jest.config.ts",
+        "test:frontend": "npx jest --config frontend/jest.config.ts",
         "clean": "rimraf dist && rimraf backend/dist && rimraf frontend/dist",
         "rebuild": "npm --workspace frontend run rebuild && npm --workspace backend run rebuild",
         "reset": "npm run clean && npm run rebuild"
     },
     "dependencies": {
         "@types/jsonwebtoken": "^9.0.10",
+        "axios": "^1.10.0",
         "jsonwebtoken": "^9.0.2"
     },
     "devDependencies": {
+        "@types/jest": "^30.0.0",
         "@types/node": "^24.0.14",
         "concurrently": "^8.0.0",
         "eslint": "^8.0.0",
+        "jest": "^30.0.4",
         "rimraf": "^5.0.10",
+        "ts-jest": "^29.4.0",
         "tsconfig-paths": "^4.2.0",
         "typescript": "^5.0.0"
     },

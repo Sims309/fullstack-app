@@ -1,4 +1,4 @@
-// src/server.ts
+// src/server.ts 
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -11,15 +11,17 @@ import authRoutes from './server/routes/authRoutes';
 import playersRoutes from './server/routes/playersRoutes';
 import joueurRoutes from './server/routes/joueurRoutes';
 import { authenticateToken } from './server/routes/middleware/authMiddleware';
+import { cookieSessionChecker } from './server/routes/middleware/cookieSessionChecker';
+import { protectAgainstSQLInjection } from './server/routes/middleware/protectAgainstSQLInjection';
 
 import { db } from './db';
 import logger from './server/logger';
 
 dotenv.config();
 
-// ✅ Export nommé pour pouvoir l'utiliser dans index.ts
 export const app = express();
 
+// 🔐 Sécurité globale
 app.use(helmet());
 app.use(morgan('dev'));
 
@@ -39,11 +41,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// ✅ Middleware global contre injection SQL
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/health') || req.path.startsWith('/api/ping')) {
+    return next();
+  }
+  return protectAgainstSQLInjection(req, res, next);
+});
+
+// ✅ Middleware global de session cookie JWT
+app.use(cookieSessionChecker);
+
+// ✅ Routes principales
 app.use('/api/auth', authRoutes);
 app.use('/api/players', playersRoutes);
 app.use('/api/joueurs', joueurRoutes);
 
-// ✅ Route protégée
+// ✅ Route protégée (test JWT)
 app.get('/api/protected', authenticateToken, (req: Request, res: Response) => {
   res.json({ message: 'Route protégée accessible' });
 });
@@ -59,13 +73,13 @@ app.get('/api/me', authenticateToken, async (req: Request, res: Response) => {
   const sql = 'SELECT id, email, username, role FROM users WHERE id = ? LIMIT 1';
 
   try {
-    const [results] = await db.query(sql, [userId]);
+    const [rows] = await db.query(sql, [userId]) as [any[], any];
 
-    if ((results as any[]).length === 0) {
+    if (rows.length === 0) {
       return res.status(404).json({ error: 'Utilisateur non trouvé.' });
     }
 
-    res.json({ user: (results as any[])[0] });
+    res.json({ user: rows[0] });
   } catch (err) {
     logger.error("Erreur lors de la récupération de l'utilisateur:", err);
     res.status(500).json({ error: 'Erreur serveur.' });
@@ -91,4 +105,9 @@ app.get('/api/test-db', async (_req: Request, res: Response) => {
     console.error('❌ Erreur de requête test DB :', err);
     res.status(500).json({ error: 'Erreur base de données' });
   }
+});
+
+// ✅ ✅ ✅ Route racine simple (à ajouter)
+app.get('/', (_req: Request, res: Response) => {
+  res.send('Bienvenue sur l’API Fullstack 🎯');
 });

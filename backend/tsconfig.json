@@ -10,16 +10,15 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
 
-    // ✅ baseUrl pointé vers ./src pour les imports internes à backend
-    "baseUrl": "./src",
+    // ✅ baseUrl : point de départ pour les paths ci-dessous
+    "baseUrl": ".",
 
-    // ✅ alias d'import avec résolution relative à ./src
+    // ✅ alias de chemins pour imports simplifiés
     "paths": {
-      "@routes/*": ["routes/*"],
-      "@middleware/*": ["routes/middleware/*"],
-      "@utils/*": ["utils/*"],
-      
-      // ✅ alias vers le dossier partagé (en dehors de backend)
+      "@/*": ["src/*"],                               // ✅ ← AJOUT essentiel ici
+      "@routes/*": ["src/routes/*"],
+      "@middleware/*": ["src/routes/middleware/*"],
+      "@utils/*": ["src/utils/*"],
       "@shared/*": ["../shared/*"]
     }
   },

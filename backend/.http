@@ -1,0 +1,26 @@
+### Inscription utilisateur
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "password": "motdepassefort123",
+  "confirmPassword": "motdepassefort123"
+}
+
+###
+
+### Connexion utilisateur
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "password": "motdepassefort123"
+}
+
+###
+
+### Accès à la route protégée /api/me (remplace ici TOKEN_PAR_FAIRE par le vrai token reçu)
+GET http://localhost:5000/api/me
+Authorization: Bearer TOKEN_PAR_FAIRE

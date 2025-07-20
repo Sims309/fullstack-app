@@ -1,27 +1,33 @@
-// src/middleware/authenticateToken.ts
+// src/server/routes/middleware/authenticateToken.ts
 import { Request, Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
-// Plus besoin de AuthenticatedRequest : on utilise Express.Request enrichi globalement
+const JWT_SECRET = process.env.JWT_SECRET || 'secretkey';
 
-export function authenticateToken(req: Request, res: Response, next: NextFunction) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+// Interface pour req.user
+export interface JwtPayload {
+  userId: number;
+  email: string;
+  role?: string;
+}
+
+// Étend Request pour inclure user optionnel
+export interface AuthenticatedRequest extends Request {
+  user?: JwtPayload;
+}
+
+export const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  const token = req.cookies?.token || '';
 
   if (!token) {
-    return res.status(401).json({ error: 'Token manquant' });
+    return res.status(401).json({ error: 'Token manquant.' });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-
-    if (typeof decoded !== 'object' || decoded === null) {
-      return res.status(403).json({ error: 'Token invalide (type)' });
-    }
-
-    req.user = decoded as JwtPayload & { userId?: number };
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    req.user = decoded; // ajout de user sur req
     next();
   } catch (err) {
-    return res.status(403).json({ error: 'Token invalide' });
+    return res.status(401).json({ error: 'Token invalide.' });
   }
-}
+};

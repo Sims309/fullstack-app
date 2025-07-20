@@ -5,6 +5,8 @@ dist/
 # Env
 .env
 
-# Fichiers temporaires
-*.log
+# Fichiers temporaires et logs
 *.tsbuildinfo
+*.log
+logs/*.log
+**/*.log

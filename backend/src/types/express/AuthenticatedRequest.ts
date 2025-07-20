@@ -1,7 +1,11 @@
-// AuthenticatedRequest.ts
-import { Request } from 'express';
-import { JwtPayload } from 'jsonwebtoken';
-
-export interface AuthenticatedRequest extends Request {
-  user?: JwtPayload;
+export interface AuthenticatedRequest extends Express.Request {
+  user?: {
+    userId: number;
+    email: string;
+    role?: string;
+  };
+  cookies: {
+    token?: string;
+    [key: string]: any;
+  };
 }
