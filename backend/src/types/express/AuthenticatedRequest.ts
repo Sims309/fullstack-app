@@ -1,11 +1,11 @@
-export interface AuthenticatedRequest extends Express.Request {
-  user?: {
-    userId: number;
-    email: string;
-    role?: string;
-  };
-  cookies: {
-    token?: string;
-    [key: string]: any;
-  };
+import { Request } from 'express';
+
+export interface JwtPayload {
+  userId: number;
+  email: string;
+  role?: string;
+}
+
+export interface AuthenticatedRequest extends Request {
+  user?: JwtPayload;
 }

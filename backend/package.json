@@ -8,13 +8,11 @@
     "rebuild": "npm run clean && npm run build",
     "start": "node ../dist/backend/index.js",
     "dev": "nodemon -r ts-node/register -r tsconfig-paths/register src/index.ts",
-    "watch": "nodemon --exec ts-node src/index.ts"
+    "watch": "nodemon --exec ts-node src/index.ts",
+    "test": "jest",
+    "test:backend": "npm run test"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "commonjs",
-  "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
@@ -22,6 +20,7 @@
     "dotenv": "^17.1.0",
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.1",
+    "fetch-cookie": "^3.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",

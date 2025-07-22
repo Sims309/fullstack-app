@@ -34,8 +34,8 @@
         "dev:backend": "npm --workspace=backend run dev",
         "dev:frontend": "npm --workspace=frontend run dev",
         "test": "concurrently \"npm --workspace=backend run test\" \"npm --workspace=frontend run test\"",
-        "test:backend": "npx jest --config backend/jest.config.ts",
-        "test:frontend": "npx jest --config frontend/jest.config.ts",
+        "test:backend": "npm --workspace=backend run test",
+        "test:frontend": "npm --workspace=frontend run test",
         "clean": "rimraf dist && rimraf backend/dist && rimraf frontend/dist",
         "rebuild": "npm --workspace frontend run rebuild && npm --workspace backend run rebuild",
         "reset": "npm run clean && npm run rebuild"

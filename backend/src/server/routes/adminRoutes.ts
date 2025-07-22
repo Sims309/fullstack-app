@@ -1,8 +1,8 @@
 // src/server/routes/adminRoutes.ts
 import express from 'express';
-import { cookieSessionChecker } from './middleware/cookieSessionChecker';
-import { checkUserRole } from './middleware/checkUserRole';
-import { readFraudLogs } from '../../utils/auditLogger'; // ✅ Import du logger
+import { cookieSessionChecker } from '@middleware/cookieSessionChecker';
+import { checkUserRole } from '@middleware/checkUserRole';
+import { readFraudLogs } from '@utils/auditLogger';  // ✅ Import du logger
 
 const router = express.Router();
 

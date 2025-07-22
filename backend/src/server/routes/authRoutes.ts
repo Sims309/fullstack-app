@@ -6,8 +6,8 @@ import {
   logoutUser,
   getCurrentUser
 } from '../../controllers/authController';
-import { authenticateToken } from './middleware/authMiddleware';
-import loginRateLimiter from './middleware/loginRateLimiter'; // ✅ Import du middleware anti-brute-force
+import { authenticateToken } from '@middleware/authMiddleware';
+import loginRateLimiter from '@middleware/loginRateLimiter';  // ✅ Import du middleware anti-brute-force
 
 const router = express.Router();
 

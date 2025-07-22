@@ -3,10 +3,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { db } from '../db';
-
-// Import du type AuthenticatedRequest
-import { AuthenticatedRequest } from '@/types/express/authenticatedRequest';
-
+import { AuthenticatedRequest } from '@/types/express/AuthenticatedRequest';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secretkey';
 
@@ -62,11 +59,11 @@ export const loginUser = async (req: Request, res: Response) => {
       { expiresIn: '1h' }
     );
 
-    res.cookie('token', token, {
+    res.cookie('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 3600000,
-      sameSite: 'lax'
+      sameSite: 'lax',
     });
 
     res.json({ message: 'Connexion réussie' });
@@ -77,12 +74,16 @@ export const loginUser = async (req: Request, res: Response) => {
 };
 
 export const logoutUser = (_req: Request, res: Response) => {
-  res.clearCookie('token');
-  res.json({ message: 'Déconnecté' });
+  res.clearCookie('auth-token', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+  });
+
+  res.status(200).json({ message: 'Déconnecté' });
 };
 
 export const getCurrentUser = async (req: Request, res: Response) => {
-  // cast sûr car authenticateToken middleware ajoute req.user
   const authReq = req as AuthenticatedRequest;
   const payload = authReq.user;
 

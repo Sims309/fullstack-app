@@ -5,27 +5,27 @@
     "rootDir": ".",
     "outDir": "../dist/backend",
     "tsBuildInfoFile": "../dist/backend/tsconfig.backend.tsbuildinfo",
-
-    "types": ["node", "jest"],
     "moduleResolution": "node",
     "esModuleInterop": true,
-
-    // ✅ baseUrl : point de départ pour les paths ci-dessous
+    "types": ["node", "jest"],
     "baseUrl": ".",
-
-    // ✅ alias de chemins pour imports simplifiés
     "paths": {
-      "@/*": ["src/*"],                               // ✅ ← AJOUT essentiel ici
-      "@routes/*": ["src/routes/*"],
-      "@middleware/*": ["src/routes/middleware/*"],
+      "@/*": ["src/*"],
+      "@routes/*": ["src/server/routes/*"],
+      "@middleware/*": ["src/server/middleware/*"],
       "@utils/*": ["src/utils/*"],
-      "@shared/*": ["../shared/*"]
-    }
+      "@shared/*": ["../shared/*"],
+      "@controllers/*": ["src/server/controllers/*"]
+    },
+    "target": "ES2020",
+    "module": "commonjs",
+    "strict": true
   },
   "include": [
     "src/**/*.ts",
     "scripts/**/*.ts",
-    "tests/**/*.ts"
+    "tests/**/*.ts",
+    "src/types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",

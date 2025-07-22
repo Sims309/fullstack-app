@@ -1,4 +1,4 @@
-// src/server.ts 
+// src/server.ts
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -10,9 +10,11 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './server/routes/authRoutes';
 import playersRoutes from './server/routes/playersRoutes';
 import joueurRoutes from './server/routes/joueurRoutes';
-import { authenticateToken } from './server/routes/middleware/authMiddleware';
-import { cookieSessionChecker } from './server/routes/middleware/cookieSessionChecker';
-import { protectAgainstSQLInjection } from './server/routes/middleware/protectAgainstSQLInjection';
+import protectedRoutes from '@routes/protectedRoutes'; // ✅ Ajout ici
+
+import { authenticateToken } from '@middleware/authMiddleware';
+import { cookieSessionChecker } from '@middleware/cookieSessionChecker';
+import { protectAgainstSQLInjection } from '@middleware/protectAgainstSQLInjection';
 
 import { db } from './db';
 import logger from './server/logger';
@@ -56,6 +58,7 @@ app.use(cookieSessionChecker);
 app.use('/api/auth', authRoutes);
 app.use('/api/players', playersRoutes);
 app.use('/api/joueurs', joueurRoutes);
+app.use(protectedRoutes); // ✅ Ajout de la route sécurisée
 
 // ✅ Route protégée (test JWT)
 app.get('/api/protected', authenticateToken, (req: Request, res: Response) => {
@@ -64,7 +67,8 @@ app.get('/api/protected', authenticateToken, (req: Request, res: Response) => {
 
 // ✅ Infos utilisateur connecté
 app.get('/api/me', authenticateToken, async (req: Request, res: Response) => {
-  const userId = req.user?.userId;
+  const user = req.user as { userId?: string; email?: string; role?: string }; // ✅ Correction ici
+  const userId = user.userId;
 
   if (!userId) {
     return res.status(400).json({ error: 'Utilisateur non identifié' });
@@ -107,7 +111,7 @@ app.get('/api/test-db', async (_req: Request, res: Response) => {
   }
 });
 
-// ✅ ✅ ✅ Route racine simple (à ajouter)
+// ✅ Route racine simple
 app.get('/', (_req: Request, res: Response) => {
   res.send('Bienvenue sur l’API Fullstack 🎯');
 });

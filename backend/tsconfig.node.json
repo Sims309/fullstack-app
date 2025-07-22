@@ -2,14 +2,14 @@
   "compilerOptions": {
     "target": "es2020",
     "module": "commonjs",
-    "rootDir": "..",                     // 🔧 MODIFIÉ ICI
-    "outDir": "./dist",
+    "rootDir": "./src",                             // ✅ Correction ici
+    "outDir": "../dist/backend",                    // ✅ Sortie claire
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
+    "baseUrl": ".",                                 // ✅ Pour utiliser les alias
     "paths": {
-      "@shared/*": ["../shared/*"]
+      "@shared/*": ["../shared/*"]                  // ✅ Accès aux types partagés
     },
     "types": ["node"],
     "typeRoots": ["../node_modules/@types"]
