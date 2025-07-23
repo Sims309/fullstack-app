@@ -3,13 +3,11 @@
     "target": "es2020",
     "module": "commonjs",
     "lib": ["es2020", "dom", "dom.iterable"],
-
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["shared/*"]
+      "@shared/*": ["shared/types/*"] // ✅ Correction ici
     },
-
     "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
@@ -17,8 +15,6 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-
-    // ✅ Important : empêche TypeScript de charger des types globaux par défaut
     "types": []
   }
 }

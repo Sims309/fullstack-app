@@ -14,30 +14,47 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Table : players
-CREATE TABLE IF NOT EXISTS players (
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100),
-  position VARCHAR(10),
-  rating FLOAT,
-  image_url TEXT,
-  biography TEXT,
-  statistics TEXT,
-  position_id INT,
-  country VARCHAR(100),
-  image VARCHAR(255),
-  fifa_points INT,
-  age INT,
-  club VARCHAR(100),
-  nationalite VARCHAR(100),
-  trophees_majeurs TEXT
-);
+-- Table : DROP TABLE IF EXISTS joueurs;
 
--- Table : positions
+CREATE TABLE joueurs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) DEFAULT NULL,
+  biography TEXT DEFAULT NULL,
+  statistics TEXT DEFAULT NULL,
+  posteId INT DEFAULT NULL,
+  country VARCHAR(100) DEFAULT NULL,
+  image VARCHAR(255) DEFAULT NULL,
+  fifa_points INT DEFAULT NULL,
+  age INT DEFAULT NULL,
+  club VARCHAR(100) DEFAULT NULL,
+  nationalite VARCHAR(100) DEFAULT NULL,
+  buts INT NOT NULL DEFAULT 0,
+  passes INT NOT NULL DEFAULT 0,
+  cartons_jaunes INT NOT NULL DEFAULT 0,
+  cartons_rouges INT NOT NULL DEFAULT 0,
+  trophees_majeurs TEXT DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- Création table positions si elle n'existe pas
 CREATE TABLE IF NOT EXISTS positions (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL
 );
+
+-- Mise à jour des noms des postes
+UPDATE positions SET name = 'gardiens' WHERE id = 1;
+UPDATE positions SET name = 'defenseursCentraux' WHERE id = 2;
+UPDATE positions SET name = 'defenseursDroits' WHERE id = 3;
+UPDATE positions SET name = 'defenseursGauches' WHERE id = 4;
+UPDATE positions SET name = 'milieuxDefensifs' WHERE id = 5;
+UPDATE positions SET name = 'milieuxRelayeurs' WHERE id = 6;
+UPDATE positions SET name = 'milieuxOffensifs' WHERE id = 7;
+UPDATE positions SET name = 'ailiersDroits' WHERE id = 8;
+UPDATE positions SET name = 'ailiersGauches' WHERE id = 9;
+UPDATE positions SET name = 'attaquantsDeSoutien' WHERE id = 10;
+UPDATE positions SET name = 'buteurs' WHERE id = 11;
+
 
 -- Table : ideal_team
 CREATE TABLE IF NOT EXISTS ideal_team (
@@ -59,3 +76,5 @@ INSERT INTO positions (name) VALUES
 INSERT INTO players (name, position, rating, age, club, nationalite) VALUES
 ('Lionel Messi', 'FWD', 94.5, 36, 'Inter Miami', 'Argentine'),
 ('Kevin De Bruyne', 'MID', 91.2, 33, 'Manchester City', 'Belgique');
+
+

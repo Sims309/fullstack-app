@@ -1,6 +1,6 @@
 // src/scripts/insertAllPlayers.ts
 import { db } from '../../../db';
-import { joueursParPoste, Joueur } from '@shared/types/joueurs';
+import { joueursParPoste, Joueur } from '@shared/joueurs';
 
 const positions: { [key: string]: { label: string; id: number } } = {
   gardiens: { label: 'GK', id: 1 },
