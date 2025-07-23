@@ -1,4 +1,4 @@
-import { gardiens, Joueur } from '@shared/joueurs';
+import { gardiens, Joueur } from '@shared/types/joueurs';
 
 describe('Gardiens - données bien formées', () => {
   it('devrait contenir au moins un gardien', () => {

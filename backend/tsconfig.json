@@ -14,10 +14,10 @@
       "@routes/*": ["src/server/routes/*"],
       "@middleware/*": ["src/server/middleware/*"],
       "@utils/*": ["src/utils/*"],
-      "@shared/*": ["../shared/types/*"],       // ✅ Corrigé ici
+      "@shared/*": ["../shared/*"],
       "@controllers/*": ["src/server/controllers/*"],
-      "@types/*": ["src/types/*"],              // ✅ Conserve pour les .d.ts si besoin
-      "@server": ["src/server.ts"]              // ✅ Pour import { app } from '@server'
+      "@types/*": ["src/types/*"],
+      "@server": ["src/server.ts"]
     },
     "target": "ES2020",
     "module": "commonjs",
