@@ -12,6 +12,8 @@ import playersRoutes from './server/routes/playersRoutes';
 import joueurRoutes from './server/routes/joueurRoutes';
 import protectedRoutes from '@routes/protectedRoutes'; // ✅ Ajout ici
 
+import equipeIdealRoutes from './server/routes/equipeIdeal.routes'; // <-- Nouvelle ligne import
+
 import { authenticateToken } from '@middleware/authMiddleware';
 import { cookieSessionChecker } from '@middleware/cookieSessionChecker';
 import { protectAgainstSQLInjection } from '@middleware/protectAgainstSQLInjection';
@@ -58,6 +60,7 @@ app.use(cookieSessionChecker);
 app.use('/api/auth', authRoutes);
 app.use('/api/players', playersRoutes);
 app.use('/api/joueurs', joueurRoutes);
+app.use('/api/equipe', equipeIdealRoutes); // <-- Ligne ajoutée ici
 app.use(protectedRoutes); // ✅ Ajout de la route sécurisée
 
 // ✅ Route protégée (test JWT)

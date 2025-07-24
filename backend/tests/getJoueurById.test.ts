@@ -1,23 +1,20 @@
+// tests/getJoueurById.test.ts
 import request from 'supertest';
 import { app } from '@server';
 
-import { Joueur } from '@shared/joueurs'; // fonctionne si joueurs.ts exporte correctement l'interface
-
-
- // adapte le chemin si besoin
+import { Joueur } from '@shared/types/joueurs';
 
 describe('GET /api/joueurs/:id', () => {
   it('devrait retourner un joueur complet avec toutes les propriétés attendues', async () => {
-    const response = await request(app).get('/api/joueurs/1'); // Buffon
+    const response = await request(app).get('/api/joueurs/2'); // Buffon a maintenant id 2
 
     expect(response.status).toBe(200);
 
     const joueur: Joueur = response.body;
 
-    // Vérifie toutes les propriétés
-    expect(joueur).toHaveProperty('id', 1);
+    expect(joueur).toHaveProperty('id', 2);
     expect(joueur).toHaveProperty('posteId', 1);
-    expect(joueur).toHaveProperty('name', 'Gianluigi Buffon');
+    expect(joueur).toHaveProperty('name', expect.stringMatching(/buffon/i));
     expect(joueur).toHaveProperty('country', 'Italie');
     expect(joueur).toHaveProperty('image');
     expect(joueur).toHaveProperty('fifa_points');
@@ -32,8 +29,7 @@ describe('GET /api/joueurs/:id', () => {
     expect(joueur).toHaveProperty('cartons_jaunes');
     expect(joueur).toHaveProperty('cartons_rouges');
 
-    // Vérifie quelques valeurs précises (facultatif)
-    expect(joueur.club).toBe('Retraité');
+    expect(joueur.club.toLowerCase()).toBe('retraité');
     expect(typeof joueur.fifa_points).toBe('number');
     expect(joueur.buts).toBe(0);
   });

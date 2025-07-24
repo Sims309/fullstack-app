@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Joueur {
+  id     String @id @default(uuid())
+  nom    String
+  poste  Int
+  rating Float
+
+  equipeIdeal EquipeIdeal[] @relation("JoueurEquipe")
+}
+
+model EquipeIdeal {
+  id       String   @id @default(uuid())
+  joueurId String
+  poste    Int
+  addedAt  DateTime @default(now())
+
+  joueur Joueur @relation("JoueurEquipe", fields: [joueurId], references: [id])
+}

@@ -1,8 +1,9 @@
+// tests/gardiens.unit.test.ts
 import { gardiens, Joueur } from '@shared/types/joueurs';
 
 describe('Gardiens - données bien formées', () => {
-  it('devrait contenir au moins un gardien', () => {
-    expect(gardiens.length).toBeGreaterThan(0);
+  it('devrait contenir exactement 10 gardiens', () => {
+    expect(gardiens.length).toBe(10);
   });
 
   it('chaque gardien devrait avoir toutes les propriétés requises', () => {
@@ -25,11 +26,57 @@ describe('Gardiens - données bien formées', () => {
     });
   });
 
-  it('le premier gardien devrait être Gianluigi Buffon (valeurs de test)', () => {
-    const buffon = gardiens[0];
+  it("les ID des gardiens devraient être de 1 à 10", () => {
+    const ids = gardiens.map((g) => g.id);
+    expect(ids).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  });
 
-    expect(buffon.name).toMatch(/buffon/i);
-    expect(buffon.club.toLowerCase()).toBe('retraité');
-    expect(buffon.posteId).toBe(1); // poste gardien
+  it('les gardiens devraient être dans le bon ordre avec les bons noms', () => {
+    const nomsAttendus = [
+      'Lev Yashin',
+      'Gianluigi Buffon',
+      'Manuel Neuer',
+      'Dino Zoff',
+      'Peter Schmeichel',
+      'Iker Casillas',
+      'Oliver Kahn',
+      'Raimond Aumann',
+      'Keylor Navas',
+      'David De Gea',
+    ];
+
+    nomsAttendus.forEach((nom, index) => {
+      expect(gardiens[index].name).toBe(nom);
+    });
+  });
+
+  it('🧾 Affiche les noms de tous les gardiens dans la console', () => {
+    const noms = gardiens.map((g) => g.name);
+    console.log('📋 Noms des gardiens détectés :', noms);
+    expect(noms.length).toBe(10);
+  });
+
+  it('🧪 Le premier gardien contient toutes les données prêtes à être affichées', () => {
+    const gardien: Joueur = gardiens[0]; // Lev Yashin normalement
+
+    console.log('📋 Premier gardien complet :', gardien);
+
+    expect(gardien).toBeDefined();
+    expect(gardien).toHaveProperty('id', 1);
+    expect(typeof gardien.posteId).toBe('number');
+    expect(typeof gardien.name).toBe('string');
+    expect(typeof gardien.country).toBe('string');
+    expect(typeof gardien.image).toBe('string');
+    expect(typeof gardien.fifa_points).toBe('number');
+    expect(typeof gardien.biography).toBe('string');
+    expect(typeof gardien.statistics).toBe('string');
+    expect(typeof gardien.trophees_majeurs).toBe('string');
+    expect(typeof gardien.age).toBe('number');
+    expect(typeof gardien.club).toBe('string');
+    expect(typeof gardien.nationalite).toBe('string');
+    expect(typeof gardien.buts).toBe('number');
+    expect(typeof gardien.passes).toBe('number');
+    expect(typeof gardien.cartons_jaunes).toBe('number');
+    expect(typeof gardien.cartons_rouges).toBe('number');
   });
 });
