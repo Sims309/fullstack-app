@@ -1,50 +1,66 @@
 // backend/tests/auth.test.ts
-import { describe, test, expect } from '@jest/globals';
-
-const baseUrl = 'http://localhost:5000/api/auth';
+import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
+import request from 'supertest';
+import { app } from '../src/server'; // Import nommé correspondant à export const app
 
 describe('Tests de la route /me', () => {
   let token: string | null = null;
+  let server: any;
+
+  beforeAll(async () => {
+    // Démarrer le serveur pour les tests si nécessaire
+    // server = app.listen(0); // Port automatique pour les tests
+  });
+
+  afterAll(async () => {
+    // Fermer le serveur après les tests
+    // if (server) {
+    //   server.close();
+    // }
+  });
 
   test('GET /me sans token doit renvoyer une erreur', async () => {
-    const res = await fetch(`${baseUrl}/me`);
-    const body = await res.json();
+    const res = await request(app)
+      .get('/api/auth/me')
+      .expect(401);
 
-    expect(res.status).toBe(401);
-    expect(body).toHaveProperty('error', 'Token manquant');
-    expect(body).toHaveProperty('message');
+    expect(res.body).toHaveProperty('error', 'Token manquant');
+    expect(res.body).toHaveProperty('message');
   });
 
   test('POST /login doit renvoyer un token', async () => {
-    const loginRes = await fetch(`${baseUrl}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({
         email: 'fictif@test.com',
         password: 'test1234',
-      }),
-    });
+      })
+      .expect(200);
 
-    const setCookie = loginRes.headers.get('set-cookie') || '';
-    const match = setCookie.match(/auth-token=([^;]+);/);
-    token = match ? match[1] : null;
+    // Récupérer le token depuis les cookies
+    const setCookie = loginRes.headers['set-cookie'];
+    if (setCookie && Array.isArray(setCookie)) {
+      const authCookie = setCookie.find(cookie => cookie.includes('auth-token='));
+      if (authCookie) {
+        const match = authCookie.match(/auth-token=([^;]+);/);
+        token = match ? match[1] : null;
+      }
+    }
 
     expect(token).toBeTruthy();
   });
 
   test('GET /me avec token doit retourner les infos utilisateur', async () => {
-    const res = await fetch(`${baseUrl}/me`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    // S'assurer qu'on a un token du test précédent
+    expect(token).toBeTruthy();
 
-    const body = await res.json();
+    const res = await request(app)
+      .get('/api/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
 
-    expect(res.status).toBe(200);
-    expect(body).toHaveProperty('user');
-    expect(body.user).toMatchObject({
+    expect(res.body).toHaveProperty('user');
+    expect(res.body.user).toMatchObject({
       email: 'fictif@test.com',
       role: expect.any(String),
     });

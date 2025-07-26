@@ -1,29 +1,17 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt, { JwtPayload, TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken';
+// src/server/middleware/authMiddleware.ts
+import { Response, NextFunction } from 'express';
+import jwt, { TokenExpiredError, JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
+import { AuthenticatedRequest } from '@/types/express/AuthenticatedRequest';
 
-// ✅ Extension du type global pour Express.Request
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        userId?: number;
-        email?: string;
-        role?: string;
-        iat?: number;
-        exp?: number;
-      };
-    }
-  }
-}
+const JWT_SECRET = process.env.JWT_SECRET || 'secretkey';
 
-// ✅ Middleware Express standard avec typage compatible
 export function authenticateToken(
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): void {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : undefined;
 
   if (!token) {
     res.status(401).json({
@@ -34,24 +22,17 @@ export function authenticateToken(
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
-    if (typeof decoded === 'string') {
-      res.status(403).json({
-        error: 'Token invalide',
-        message: 'Le format du token est incorrect'
-      });
-      return;
-    }
-
-    req.user = decoded as JwtPayload & {
-      userId?: number;
-      email?: string;
-      role?: string;
+    req.user = {
+      userId: String(decoded.userId), // conversion string ici
+      email: decoded.email as string,
+      role: decoded.role as string | undefined,
+      iat: decoded.iat,
+      exp: decoded.exp
     };
 
     next();
-
   } catch (error) {
     if (error instanceof TokenExpiredError) {
       res.status(401).json({

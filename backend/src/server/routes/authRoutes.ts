@@ -1,26 +1,40 @@
-// authRoutes.ts
+// src/server/routes/authRroutes.ts
+
 import express from 'express';
 import {
   registerUser,
   loginUser,
   logoutUser,
   getCurrentUser
-} from '../../controllers/authController';
-import { authenticateToken } from '@middleware/authMiddleware';
-import loginRateLimiter from '@middleware/loginRateLimiter';  // ✅ Import du middleware anti-brute-force
+} from '@/controllers/authController';
+import { authenticateToken } from '@middleware/authenticateToken';
+import loginRateLimiter from '@middleware/loginRateLimiter';
+import { validateRequest } from '@middleware/validateRequest';
+import { loginSchema, registerSchema } from '@schemas/user.schema';
 
 const router = express.Router();
 
-// Route d'inscription
-router.post('/register', registerUser);
+// ── Inscription ────────────────────────────────────────────
+// En cas d’erreur de validation Zod, on renvoie HTTP 402 (Payment Required)
+router.post(
+  '/register',
+  validateRequest(registerSchema, 402),
+  registerUser
+);
 
-// ✅ Route de connexion protégée par un rate limiter
-router.post('/login', loginRateLimiter, loginUser);
+// ── Connexion ──────────────────────────────────────────────
+// Anti-brute-force + validation Zod avec HTTP 402 si échec
+router.post(
+  '/login',
+  loginRateLimiter,
+  validateRequest(loginSchema, 402),
+  loginUser
+);
 
-// Route de déconnexion
+// ── Déconnexion ────────────────────────────────────────────
 router.post('/logout', logoutUser);
 
-// ✅ Route protégée pour récupérer l'utilisateur courant
+// ── Récupérer l’utilisateur courant ────────────────────────
 router.get('/me', authenticateToken, getCurrentUser);
 
 export default router;

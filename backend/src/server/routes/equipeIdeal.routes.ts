@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
-import { EquipeIdealService } from '@services/EquipeIdeal.service';
+import { EquipeIdealService } from '@services/equipeIdeal.service';
+
 
 
 const router = express.Router();

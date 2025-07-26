@@ -15,21 +15,20 @@
       "@middleware/*": ["src/server/middleware/*"],
       "@utils/*": ["src/utils/*"],
       "@shared/*": ["../shared/*"],
-      "@controllers/*": ["src/server/controllers/*"],  // ✅ s'assurer que le dossier existe
+      "@controllers/*": ["src/server/controllers/*"],
       "@types/*": ["src/types/*"],
-      "@server": ["src/server.ts"],                    // ✅ ou "src/server/index.ts" selon ton projet réel
+      "@server": ["src/server.ts"],
       "@prismaClient": ["src/server/prismaClient.ts"],
-      "@services/*": ["src/server/services/*"]
+      "@services/*": ["src/server/services/*"],
+      "@schemas/*": ["src/server/validation/schemas/*"]
     },
     "target": "ES2020",
     "module": "commonjs",
     "strict": true
   },
   "include": [
-    "src/**/*.ts",
-    "scripts/**/*.ts",
-    "tests/**/*.ts",
-    "src/types/**/*.d.ts"
+    "src/types/**/*.d.ts",
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",

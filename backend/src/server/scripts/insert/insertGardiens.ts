@@ -1,7 +1,7 @@
 // backend/src/server/scripts/insert/insertGardiens.ts
 
 import { db } from '../../../db';
-import { gardiens, type Joueur } from '@shared/joueurs';
+import { gardiens, type Joueur } from '@shared/types/joueurs';
 
 const insertGardiens = async (): Promise<void> => {
   if (!gardiens.length) {

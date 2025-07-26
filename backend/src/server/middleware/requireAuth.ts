@@ -1,3 +1,4 @@
+// src/middleware/requireAuth.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { AuthenticatedRequest } from '@/types/express/AuthenticatedRequest';
@@ -13,7 +14,10 @@ export const requireAuth = (req: AuthenticatedRequest, res: Response, next: Next
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: number; email: string; role?: string };
-    req.user = decoded;
+    req.user = {
+      ...decoded,
+      userId: decoded.userId.toString(), // Conversion de number à string
+    };
     next();
   } catch (err) {
     console.error('❌ Erreur de vérification du token :', (err as Error).message);

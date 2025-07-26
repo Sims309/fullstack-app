@@ -1,8 +1,15 @@
-import { Request, Response, NextFunction } from 'express';
+// src/server/middleware/cookieSessionChecker.ts
+import { Response, NextFunction } from 'express';
 import jwt, { JwtPayload, JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import { AuthenticatedRequest } from '@/types/express/AuthenticatedRequest';
 
-// ✅ Ne pas écrire : `: void`
-export const cookieSessionChecker = (req: Request, res: Response, next: NextFunction) => {
+const JWT_SECRET = process.env.JWT_SECRET || 'secretkey';
+
+export const cookieSessionChecker = (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
   const token = req.cookies?.token;
 
   if (!token) {
@@ -10,11 +17,15 @@ export const cookieSessionChecker = (req: Request, res: Response, next: NextFunc
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
     req.user = {
       ...(req.user || {}),
-      ...decoded,
+      userId: decoded.userId as string,
+      email: decoded.email as string,
+      role: decoded.role as string | undefined,
+      iat: decoded.iat,
+      exp: decoded.exp
     };
 
     return next(); // ✅ Token valide → continuer

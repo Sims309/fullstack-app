@@ -1,11 +1,13 @@
 import { Request } from 'express';
 
-export interface JwtPayload {
-  userId: number;
+export interface UserPayload {
+  userId: string;  // <-- ici string uniquement, pas number
   email: string;
   role?: string;
+  iat?: number;
+  exp?: number;
 }
 
 export interface AuthenticatedRequest extends Request {
-  user?: JwtPayload;
+  user?: UserPayload;
 }

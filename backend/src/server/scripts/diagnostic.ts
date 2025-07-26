@@ -1,7 +1,7 @@
 // fullstack-app/backend/src/server/scripts/diagnostic.ts
 
 // ✅ Import mis à jour vers le bon fichier partagé
-import { joueursParPoste, Joueur as Player } from '@shared/joueurs';
+import { joueursParPoste, Joueur as Player } from '@shared/types/joueurs';
 
 async function runDiagnostic() {
   try {

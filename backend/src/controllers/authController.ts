@@ -5,14 +5,13 @@ import jwt from 'jsonwebtoken';
 import { db } from '../db';
 import { AuthenticatedRequest } from '@/types/express/AuthenticatedRequest';
 
+// Import des types inférés Zod
+import { LoginInput, RegisterInput } from '@schemas/user.schema';
+
 const JWT_SECRET = process.env.JWT_SECRET || 'secretkey';
 
 export const registerUser = async (req: Request, res: Response) => {
-  const { email, password, username } = req.body;
-
-  if (!email || !password || !username) {
-    return res.status(400).json({ error: 'Tous les champs sont requis.' });
-  }
+  const { email, password, username } = req.body as RegisterInput;
 
   try {
     const checkSql = 'SELECT id FROM users WHERE email = ? LIMIT 1';
@@ -34,11 +33,7 @@ export const registerUser = async (req: Request, res: Response) => {
 };
 
 export const loginUser = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email et mot de passe requis.' });
-  }
+  const { email, password } = req.body as LoginInput;
 
   try {
     const sql = 'SELECT id, email, username, password FROM users WHERE email = ? LIMIT 1';

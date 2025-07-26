@@ -1,44 +1,44 @@
-// src/server/routes/middleware/authenticateToken.ts
+// src/server/middleware/authenticateToken.ts
 import { Response, NextFunction } from 'express';
+import { AuthenticatedRequest } from '@/types/express/AuthenticatedRequest'; // Import interface
 import jwt from 'jsonwebtoken';
-import { AuthenticatedRequest } from '@/types/express/AuthenticatedRequest';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secretkey';
 
-export const authenticateToken = (
-  req: AuthenticatedRequest,
+export function authenticateToken(
+  req: AuthenticatedRequest, // <-- Remplace Request par AuthenticatedRequest
   res: Response,
   next: NextFunction
-) => {
-  console.log('🧪 Cookies reçus :', req.cookies);
-  console.log('🧪 Header Authorization :', req.headers.authorization);
-
-  // ✅ Priorité : Cookie "auth-token"
-  let token = req.cookies?.['auth-token'];
-
-  // ✅ Fallback : Header Authorization: Bearer <token>
-  if (!token && req.headers.authorization?.startsWith('Bearer ')) {
-    token = req.headers.authorization.split(' ')[1];
-  }
+): void {
+  const tokenFromCookie = req.cookies?.['auth-token'];
+  const authHeader = req.headers['authorization'] as string | undefined;
+  const token =
+    tokenFromCookie ||
+    (authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : undefined);
 
   if (!token) {
-    return res.status(401).json({
+    res.status(401).json({
       error: 'Token manquant',
       message: 'Un token d\'authentification est requis',
     });
+    return;
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as {
-      userId: number;
-      email: string;
-      role?: string;
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    req.user = {
+      userId: decoded.userId,
+      email: decoded.email,
+      role: decoded.role,
+      iat: decoded.iat,
+      exp: decoded.exp,
     };
-
-    req.user = decoded;
     next();
-  } catch (error) {
-    console.error('❌ Token invalide :', error);
-    return res.status(401).json({ error: 'Token invalide' });
+  } catch (err) {
+    res.status(401).json({
+      error: 'Token invalide',
+      message: 'Le token fourni est invalide ou expiré',
+    });
+    return;
   }
-};
+}
