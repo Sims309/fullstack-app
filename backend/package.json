@@ -9,7 +9,7 @@
     "start": "node ../dist/backend/index.js",
     "dev": "nodemon -r ts-node/register -r tsconfig-paths/register src/index.ts",
     "watch": "nodemon --exec ts-node src/index.ts",
-    "test": "jest",
+    "test": "jest --runInBand --detectOpenHandles",
     "test:backend": "npm run test"
   },
   "type": "commonjs",
