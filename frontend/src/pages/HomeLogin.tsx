@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import '../../styles/index.css'; // Fichier CSS global (inclura notre style)
 
 interface LoginResponse {
   message: string;
@@ -42,11 +43,10 @@ const HomeLogin: React.FC = () => {
     setError("");
 
     try {
-      // URL corrigée pour votre backend local
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // Important pour les cookies
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -59,11 +59,8 @@ const HomeLogin: React.FC = () => {
       }
 
       const data: LoginResponse = await response.json();
-
-      // Le token est maintenant dans les cookies HTTP-only
       console.log("Connexion réussie:", data.message);
-      
-      // Redirection vers la page accueil
+
       navigate("/accueil");
     } catch (err) {
       if (err instanceof Error) {
@@ -77,70 +74,42 @@ const HomeLogin: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "auto", marginTop: 100 }}>
-      <h2>Connexion</h2>
-      <form onSubmit={handleSubmit} noValidate>
-        <div>
-          <label htmlFor="email">Email :</label><br />
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="username"
-            disabled={loading}
-            aria-invalid={!!error}
-            aria-describedby="email-error"
-            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-          />
-        </div>
-        <div style={{ marginTop: 10 }}>
-          <label htmlFor="password">Mot de passe :</label><br />
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-            disabled={loading}
-            aria-invalid={!!error}
-            aria-describedby="password-error"
-            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-          />
-        </div>
-        {error && (
-          <p
-            id="form-error"
-            style={{ color: "red", marginTop: 10 }}
-            role="alert"
-            aria-live="assertive"
-          >
-            {error}
-          </p>
-        )}
-        <button
-          type="submit"
-          style={{ 
-            marginTop: 15, 
-            width: "100%", 
-            padding: "10px",
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: loading ? "not-allowed" : "pointer"
-          }}
-          disabled={loading}
-          aria-busy={loading}
-        >
-          {loading ? "Connexion en cours..." : "Se connecter"}
-        </button>
-      </form>
-      
-      <div style={{ marginTop: 20, textAlign: "center" }}>
-        <p>Pas encore de compte ? <a href="/register">S'inscrire</a></p>
+    <div className="login-page">
+      <div className="login-box">
+        <h2>Connexion</h2>
+        <form onSubmit={handleSubmit} noValidate>
+          <div className="form-group">
+            <label htmlFor="email">Email :</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={loading}
+              autoComplete="username"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Mot de passe :</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+              autoComplete="current-password"
+            />
+          </div>
+          {error && <p className="error">{error}</p>}
+          <button type="submit" disabled={loading}>
+            {loading ? "Connexion en cours..." : "Se connecter"}
+          </button>
+        </form>
+        <p className="register-link">
+          Pas encore de compte ? <a href="/register">S'inscrire</a>
+        </p>
       </div>
     </div>
   );
