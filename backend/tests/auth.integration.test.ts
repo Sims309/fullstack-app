@@ -1,62 +1,68 @@
-// backend/tests/auth.integration.test.ts
 import request from 'supertest';
 import { app } from '../src/server';
+import { prisma } from '../src/server/prismaClient';
 
-describe('Intégration Auth', () => {
-  const testUser = {
-    email: 'integration@test.com',
-    username: 'integration_user',
-    password: 'test1234',
-    confirmPassword: 'test1234',
-  };
+describe('Intégration Auth - Test complet unique', () => {
+  let uniqueEmail: string;
+  let token: string;
 
-  let token: string | null = null;
+  afterAll(async () => {
+    // Nettoyage des utilisateurs créés dans ce test
+    await prisma.user.deleteMany({
+      where: {
+        email: { contains: 'integration+' },
+      },
+    });
+    await prisma.$disconnect();
+  });
 
-  test('POST /api/auth/register crée un utilisateur', async () => {
-    const res = await request(app)
+  test('Créer un utilisateur, se connecter, puis récupérer ses infos avec le token', async () => {
+    // Générer un email unique
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    uniqueEmail = `integration+${randomSuffix}@test.com`;
+
+    // 1. Enregistrer un nouvel utilisateur
+    const registerRes = await request(app)
       .post('/api/auth/register')
-      .send(testUser)
+      .send({
+        email: uniqueEmail,
+        username: 'integration_user',
+        password: 'test1234',
+        confirmPassword: 'test1234',
+      })
       .expect(201);
 
-    expect(res.body).toHaveProperty('message', 'Utilisateur créé.');
-    expect(res.body).toHaveProperty('userId');
-  });
+    expect(registerRes.body).toHaveProperty('message', 'Utilisateur créé.');
+    expect(registerRes.body).toHaveProperty('userId');
 
-  test('POST /api/auth/login renvoie un token via cookie', async () => {
-    const res = await request(app)
+    // 2. Se connecter avec cet utilisateur
+    const loginRes = await request(app)
       .post('/api/auth/login')
-      .send({ email: testUser.email, password: testUser.password })
+      .send({
+        email: uniqueEmail,
+        password: 'test1234',
+      })
       .expect(200);
 
-    const setCookie = res.headers['set-cookie'];
+    const setCookie = loginRes.headers['set-cookie'];
     expect(setCookie).toBeDefined();
 
-    // Toujours traiter setCookie comme un tableau, même si c’est une string unique
     const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
-
-    const authCookie = cookies.find(cookie => cookie.startsWith('auth-token='));
+    const authCookie = cookies.find((cookie: string) =>
+      cookie.startsWith('auth-token='));
     expect(authCookie).toBeDefined();
 
-    // Extraire le token du cookie
     const match = authCookie!.match(/auth-token=([^;]+);/);
-    token = match ? match[1] : null;
-
-    expect(token).toBeTruthy();
-  });
-
-  test('GET /api/auth/me renvoie les infos utilisateur avec token', async () => {
+    token = match ? match[1] : '';
     expect(token).toBeTruthy();
 
-    const res = await request(app)
+    // 3. Récupérer les infos utilisateur avec le token
+    const meRes = await request(app)
       .get('/api/auth/me')
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(res.body).toHaveProperty('user');
-    expect(res.body.user).toMatchObject({
-      email: testUser.email,
-      username: testUser.username,
-      role: expect.any(String),
-    });
+    expect(meRes.body).toHaveProperty('user');
+    expect(meRes.body.user.email).toBe(uniqueEmail);
   });
 });

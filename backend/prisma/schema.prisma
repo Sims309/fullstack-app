@@ -25,3 +25,13 @@ model EquipeIdeal {
 
   joueur Joueur @relation("JoueurEquipe", fields: [joueurId], references: [id])
 }
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

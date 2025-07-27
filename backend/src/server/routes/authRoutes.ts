@@ -15,19 +15,19 @@ import { loginSchema, registerSchema } from '@schemas/user.schema';
 const router = express.Router();
 
 // ── Inscription ────────────────────────────────────────────
-// En cas d’erreur de validation Zod, on renvoie HTTP 402 (Payment Required)
+// En cas d’erreur de validation Zod, on renvoie HTTP 400
 router.post(
   '/register',
-  validateRequest(registerSchema, 402),
+  validateRequest(registerSchema, 400),
   registerUser
 );
 
 // ── Connexion ──────────────────────────────────────────────
-// Anti-brute-force + validation Zod avec HTTP 402 si échec
+// Anti-brute-force + validation Zod avec HTTP 400 si échec
 router.post(
   '/login',
   loginRateLimiter,
-  validateRequest(loginSchema, 402),
+  validateRequest(loginSchema, 400),
   loginUser
 );
 
