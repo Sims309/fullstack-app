@@ -1,8 +1,26 @@
 // tests/getJoueurById.test.ts
 import request from 'supertest';
-import { app } from '@server';
+import { app } from '../src/server';
 
-import { Joueur } from '@shared/types/joueurs';
+// Define Joueur type directly if module is missing
+type Joueur = {
+  id: number;
+  posteId: number;
+  name: string;
+  country: string;
+  image: string;
+  fifa_points: number;
+  biography: string;
+  statistics: any;
+  trophees_majeurs: any;
+  age: number;
+  club: string;
+  nationalite: string;
+  buts: number;
+  passes: number;
+  cartons_jaunes: number;
+  cartons_rouges: number;
+};
 
 describe('GET /api/joueurs/:id', () => {
   it('devrait retourner un joueur complet avec toutes les propriétés attendues', async () => {

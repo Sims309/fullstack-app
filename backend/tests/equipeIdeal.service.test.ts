@@ -1,73 +1,68 @@
-// tests/services/equipeIdeal.service.test.ts ✅
+import request from 'supertest';
+import { app } from '../src/server';
+import { prisma } from '../src/server/prismaClient';
 
-import { EquipeIdealService } from '@services/equipeIdeal.service';
-import { prisma } from '@/server/prismaClient';
+describe('Intégration Auth - Test complet unique', () => {
+  let uniqueEmail: string;
+  let token: string;
 
-// 🧪 Mock de prisma
-jest.mock('@/server/prismaClient', () => ({
-  prisma: {
-    joueur: {
-      findUnique: jest.fn(),
-    },
-    equipeIdeal: {
-      count: jest.fn(),
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      delete: jest.fn(),
-      update: jest.fn(),
-    },
-  },
-}));
-
-const service = new EquipeIdealService();
-
-describe('🔧 Méthodes CRUD du service EquipeIdeal', () => {
-  const joueurMock = {
-    id: '123',
-    poste: 1,
-    nom: 'Test Joueur',
-  };
-
-  beforeEach(() => {
-    jest.clearAllMocks();
+  afterAll(async () => {
+    // Nettoyage des utilisateurs créés dans ce test
+    await prisma.user.deleteMany({
+      where: {
+        email: { contains: 'integration+' },
+      },
+    });
+    await prisma.$disconnect();
   });
 
-  it('✅ addJoueur - ajoute un joueur si tout est valide', async () => {
-    (prisma.equipeIdeal.count as jest.Mock).mockResolvedValue(0);
-    (prisma.equipeIdeal.findFirst as jest.Mock).mockResolvedValue(null);
-    (prisma.joueur.findUnique as jest.Mock).mockResolvedValue(joueurMock);
-    (prisma.equipeIdeal.create as jest.Mock).mockResolvedValue({
-      ...joueurMock,
-    });
+  test('Créer un utilisateur, se connecter, puis récupérer ses infos avec le token', async () => {
+    // Générer un email unique
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    uniqueEmail = `integration+${randomSuffix}@test.com`;
 
-    const res = await service.addJoueur({ id: joueurMock.id, poste: joueurMock.poste });
+    // 1. Enregistrer un nouvel utilisateur
+    const registerRes = await request(app)
+      .post('/api/auth/register')
+      .send({
+        email: uniqueEmail,
+        username: 'integration_user',
+        password: 'test1234',
+        confirmPassword: 'test1234',
+      })
+      .expect(201);
 
-    expect(prisma.equipeIdeal.create).toHaveBeenCalled();
-    expect(res).toEqual([{ ...joueurMock }]);
-  });
+    expect(registerRes.body).toHaveProperty('message', 'Utilisateur créé.');
+    expect(registerRes.body).toHaveProperty('userId');
 
-  it('🗑️ removeJoueur - supprime un joueur par ID', async () => {
-    (prisma.equipeIdeal.delete as jest.Mock).mockResolvedValue({});
+    // 2. Se connecter avec cet utilisateur
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({
+        email: uniqueEmail,
+        password: 'test1234',
+      })
+      .expect(200);
 
-    await service.removeJoueur('123');
+    const setCookie = loginRes.headers['set-cookie'];
+    expect(setCookie).toBeDefined();
 
-    expect(prisma.equipeIdeal.delete).toHaveBeenCalledWith({
-      where: { id: '123' },
-    });
-  });
+    const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
+    const authCookie = cookies.find((cookie: string) =>
+      cookie.startsWith('auth-token='));
+    expect(authCookie).toBeDefined();
 
-  it('✏️ updateJoueur - met à jour le poste du joueur', async () => {
-    const updated = { id: '123', poste: 2 };
+    const match = authCookie!.match(/auth-token=([^;]+);/);
+    token = match ? match[1] : '';
+    expect(token).toBeTruthy();
 
-    (prisma.equipeIdeal.update as jest.Mock).mockResolvedValue(updated);
+    // 3. Récupérer les infos utilisateur avec le token
+    const meRes = await request(app)
+      .get('/api/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
 
-    const result = await service.updateJoueur('123', { poste: 2 });
-
-    expect(prisma.equipeIdeal.update).toHaveBeenCalledWith({
-      where: { id: '123' },
-      data: { poste: 2 },
-    });
-
-    expect(result).toEqual(updated);
+    expect(meRes.body).toHaveProperty('user');
+    expect(meRes.body.user.email).toBe(uniqueEmail);
   });
 });

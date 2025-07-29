@@ -1,0 +1,106 @@
+/* Accueil.css */
+#root {
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 2rem;
+	text-align: center;
+}
+
+body {
+	background-color: aqua;
+}
+
+/* Style général pour la page d'accueil */
+.accueil {
+	display: flex; /* Utilisation de flexbox pour centrer le contenu */
+	flex-direction: column; /* Disposition en colonne */
+	justify-content: center; /* Centre verticalement */
+	align-items: center; /* Centre horizontalement */
+	text-align: center;
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 2rem;
+	background-color: #f0f0f0;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Titres */
+h1 {
+	font-size: 2rem;
+	color: #333;
+	margin-bottom: 1rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	color: #555;
+	margin-bottom: 2rem;
+}
+
+/* Conteneur des boutons */
+.button-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Grille responsive */
+	gap: 0.5rem; /* Réduit l'espace entre les boutons */
+	margin-top: 2rem;
+	width: 100%; /* Assure que les boutons prennent toute la largeur disponible */
+	justify-items: center; /* Centre chaque bouton horizontalement dans sa cellule */
+}
+
+/* Style des boutons */
+.numero-button {
+	padding: 1rem;
+	font-size: 1.1rem;
+	background-color: #4caf50;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s ease, transform 0.2s ease;
+	width: auto; /* La largeur s'ajuste selon le contenu */
+	max-width: 200px; /* Limite la largeur des boutons */
+}
+
+.numero-button:hover {
+	background-color: #45a049;
+	transform: translateY(-2px); /* Légère élévation au survol */
+}
+
+.numero-button:active {
+	transform: translateY(1px); /* Effet d'enfoncement lors du clic */
+}
+
+/* Style pour le bouton de retour */
+.retour-button {
+	padding: 1rem;
+	font-size: 1.1rem;
+	background-color: #f44336; /* Couleur rouge pour le bouton de retour */
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s ease, transform 0.2s ease;
+	margin-top: 2rem; /* Espace supplémentaire au-dessus du bouton */
+}
+
+.retour-button:hover {
+	background-color: #e53935;
+	transform: translateY(-2px); /* Légère élévation au survol */
+}
+
+.retour-button:active {
+	transform: translateY(1px); /* Effet d'enfoncement lorsque le bouton est cliqué */
+}
+
+/* Amélioration de l'apparence sur petits écrans */
+@media (max-width: 600px) {
+	.button-container {
+		grid-template-columns: 1fr 1fr; /* Deux colonnes sur mobile */
+		gap: 0.5rem; /* Réduire l'espacement entre les boutons */
+	}
+
+	.numero-button {
+		max-width: 150px; /* Limiter la largeur des boutons sur mobile */
+	}
+}

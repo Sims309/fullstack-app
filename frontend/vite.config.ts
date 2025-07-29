@@ -8,7 +8,8 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@shared': path.resolve(__dirname, '../shared'),
+      '@': path.resolve(__dirname, './src'),          // ✅ Alias frontend
+      '@shared': path.resolve(__dirname, '../shared') // ✅ Alias vers code partagé
     },
   },
   server: {
@@ -16,12 +17,13 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
-        secure: false,
+        secure: false
+        // ✅ On supprime le rewrite pour conserver le /api
       },
     },
   },
   build: {
-    outDir: 'dist',         // ✅ Build frontend ira dans frontend/dist
-    emptyOutDir: true       // ✅ Nettoie uniquement frontend/dist
+    outDir: 'dist',
+    emptyOutDir: true
   },
 });

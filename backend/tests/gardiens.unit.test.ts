@@ -1,5 +1,5 @@
 // tests/gardiens.unit.test.ts
-import { gardiens, Joueur } from '@shared/types/joueurs';
+import { gardiens, Joueur } from '../../shared/types/joueurs'; // ✅ chemin vers fullstack-app/shared/types/joueurs.ts
 
 describe('Gardiens - données bien formées', () => {
   it('devrait contenir exactement 10 gardiens', () => {

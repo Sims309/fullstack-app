@@ -1,4 +1,4 @@
-// src/server/routes/authRroutes.ts
+// src/server/routes/authRoutes.ts
 
 import express from 'express';
 import {
@@ -7,6 +7,7 @@ import {
   logoutUser,
   getCurrentUser
 } from '@/controllers/authController';
+
 import { authenticateToken } from '@middleware/authenticateToken';
 import loginRateLimiter from '@middleware/loginRateLimiter';
 import { validateRequest } from '@middleware/validateRequest';
@@ -14,16 +15,16 @@ import { loginSchema, registerSchema } from '@schemas/user.schema';
 
 const router = express.Router();
 
-// ── Inscription ────────────────────────────────────────────
-// En cas d’erreur de validation Zod, on renvoie HTTP 400
+// ────────────── REGISTER ──────────────
+// ✅ Inscription avec validation Zod
 router.post(
   '/register',
   validateRequest(registerSchema, 400),
   registerUser
 );
 
-// ── Connexion ──────────────────────────────────────────────
-// Anti-brute-force + validation Zod avec HTTP 400 si échec
+// ────────────── LOGIN ─────────────────
+// ✅ Connexion avec anti-brute-force + validation Zod
 router.post(
   '/login',
   loginRateLimiter,
@@ -31,10 +32,12 @@ router.post(
   loginUser
 );
 
-// ── Déconnexion ────────────────────────────────────────────
+// ────────────── LOGOUT ────────────────
+// ✅ Déconnexion (ex. suppression cookie JWT)
 router.post('/logout', logoutUser);
 
-// ── Récupérer l’utilisateur courant ────────────────────────
+// ────────────── ME ────────────────────
+// ✅ Retourne l'utilisateur courant avec JWT
 router.get('/me', authenticateToken, getCurrentUser);
 
 export default router;

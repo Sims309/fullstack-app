@@ -2,33 +2,34 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
-    "rootDir": ".",
+    "rootDir": "src",
     "outDir": "../dist/backend",
     "tsBuildInfoFile": "../dist/backend/tsconfig.backend.tsbuildinfo",
     "moduleResolution": "node",
     "esModuleInterop": true,
+    "target": "ES2020",
+    "module": "commonjs",
+    "strict": true,
     "types": ["node", "jest"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
+      "@server/*": ["src/server/*"],
       "@routes/*": ["src/server/routes/*"],
       "@middleware/*": ["src/server/middleware/*"],
+      "@controllers/*": ["src/server/controllers/*"],
+      "@services/*": ["src/server/services/*"],
+      "@schemas/*": ["src/server/validation/schemas/*"],
+      "@types/*": ["src/types/*"],
       "@utils/*": ["src/utils/*"],
       "@shared/*": ["../shared/*"],
-      "@controllers/*": ["src/server/controllers/*"],
-      "@types/*": ["src/types/*"],
       "@server": ["src/server.ts"],
-      "@prismaClient": ["src/server/prismaClient.ts"],
-      "@services/*": ["src/server/services/*"],
-      "@schemas/*": ["src/server/validation/schemas/*"]
-    },
-    "target": "ES2020",
-    "module": "commonjs",
-    "strict": true
+      "@prismaClient": ["src/server/prismaClient.ts"]
+    }
   },
   "include": [
-    "src/types/**/*.d.ts",
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",

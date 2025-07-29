@@ -1,4 +1,5 @@
 // src/server/controllers/authController.ts
+
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -46,7 +47,9 @@ export const loginUser = async (req: Request, res: Response) => {
     const user = results[0];
     const match = await bcrypt.compare(password, user.password);
 
-    if (!match) return res.status(401).json({ error: 'Mot de passe incorrect.' });
+    if (!match) {
+      return res.status(401).json({ error: 'Mot de passe incorrect.' });
+    }
 
     const token = jwt.sign(
       { userId: user.id, email: user.email },
@@ -57,7 +60,7 @@ export const loginUser = async (req: Request, res: Response) => {
     res.cookie('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 3600000,
+      maxAge: 3600000, // 1 heure
       sameSite: 'lax',
     });
 

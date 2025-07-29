@@ -1,8 +1,10 @@
+// src/pages/HomeLogin.tsx
+
 import React, { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import '../../styles/index.css'; // Fichier CSS global (inclura notre style)
+import "../../styles/index.css"; // Ton fichier CSS global
 
 interface LoginResponse {
   message: string;
@@ -17,6 +19,7 @@ const HomeLogin: React.FC = () => {
 
   const navigate = useNavigate();
 
+  // Reset erreur à chaque changement de champ
   useEffect(() => {
     if (error) setError("");
   }, [email, password]);
@@ -43,10 +46,11 @@ const HomeLogin: React.FC = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      // ✅ Utilisation de l’URL relative pour profiter du proxy Vite
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        credentials: "include", // ✅ Pour gérer cookies/session
         body: JSON.stringify({ email, password }),
       });
 
@@ -59,8 +63,9 @@ const HomeLogin: React.FC = () => {
       }
 
       const data: LoginResponse = await response.json();
-      console.log("Connexion réussie:", data.message);
+      console.log("✅ Connexion réussie :", data.message);
 
+      // Redirection vers l'accueil après login
       navigate("/accueil");
     } catch (err) {
       if (err instanceof Error) {
@@ -90,6 +95,7 @@ const HomeLogin: React.FC = () => {
               autoComplete="username"
             />
           </div>
+
           <div className="form-group">
             <label htmlFor="password">Mot de passe :</label>
             <input
@@ -102,11 +108,14 @@ const HomeLogin: React.FC = () => {
               autoComplete="current-password"
             />
           </div>
+
           {error && <p className="error">{error}</p>}
+
           <button type="submit" disabled={loading}>
             {loading ? "Connexion en cours..." : "Se connecter"}
           </button>
         </form>
+
         <p className="register-link">
           Pas encore de compte ? <a href="/register">S'inscrire</a>
         </p>

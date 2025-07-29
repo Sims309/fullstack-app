@@ -1,62 +1,72 @@
-import { Joueur } from '@shared/types/joueurs';
+// tests/equipeIdeal.service.test.ts ✅
+import { EquipeIdealService } from '../src/server/services/equipeIdeal.service';
+import { prisma } from '../src/server/prismaClient'; // ✅ chemin relatif depuis tests/
 
-let equipeIdeale: Joueur[] = [];
+// 🧪 Mock de prisma
+jest.mock('../src/server/prismaClient', () => ({
+  prisma: {
+    joueur: {
+      findUnique: jest.fn(),
+    },
+    equipeIdeal: {
+      count: jest.fn(),
+      findFirst: jest.fn(),
+      create: jest.fn(),
+      delete: jest.fn(),
+      update: jest.fn(),
+    },
+  },
+}));
 
-const addToEquipeIdeale = (joueur: Joueur) => {
-  equipeIdeale.push(joueur);
-};
+const service = new EquipeIdealService();
 
-const removeFromEquipeIdeale = (id: number) => {
-  equipeIdeale = equipeIdeale.filter(j => j.id !== id);
-};
-
-const updateJoueurInEquipeIdeale = (id: number, updates: Partial<Joueur>) => {
-  equipeIdeale = equipeIdeale.map(j =>
-    j.id === id ? { ...j, ...updates, id: j.id } : j // ✅ corrige le bug d'écrasement
-  );
-};
-
-describe('Équipe idéale - opérations locales', () => {
-  const mockJoueur: Joueur = {
-    id: 99,
-    posteId: 1,
-    name: 'Test Gardien',
-    country: 'Testland',
-    image: 'test.jpg',
-    fifa_points: 88,
-    biography: 'Test bio',
-    statistics: '100 matchs',
-    trophees_majeurs: 'aucun',
-    age: 30,
-    club: 'Test Club',
-    nationalite: 'Test',
-    buts: 0,
-    passes: 0,
-    cartons_jaunes: 0,
-    cartons_rouges: 0
+describe('🔧 Méthodes CRUD du service EquipeIdeal', () => {
+  const joueurMock = {
+    id: '123',
+    poste: 1,
+    nom: 'Test Joueur',
   };
 
   beforeEach(() => {
-    equipeIdeale = []; // reset avant chaque test
+    jest.clearAllMocks();
   });
 
-  it('ajoute un joueur à l’équipe idéale', () => {
-    addToEquipeIdeale(mockJoueur);
-    expect(equipeIdeale.length).toBe(1);
-    expect(equipeIdeale[0].name).toBe('Test Gardien');
+  it('✅ addJoueur - ajoute un joueur si tout est valide', async () => {
+    (prisma.equipeIdeal.count as jest.Mock).mockResolvedValue(0);
+    (prisma.equipeIdeal.findFirst as jest.Mock).mockResolvedValue(null);
+    (prisma.joueur.findUnique as jest.Mock).mockResolvedValue(joueurMock);
+    (prisma.equipeIdeal.create as jest.Mock).mockResolvedValue({
+      ...joueurMock,
+    });
+
+    const res = await service.addJoueur({ id: joueurMock.id, poste: joueurMock.poste });
+
+    expect(prisma.equipeIdeal.create).toHaveBeenCalled();
+    expect(res).toEqual([{ ...joueurMock }]);
   });
 
-  it('supprime un joueur de l’équipe idéale', () => {
-    addToEquipeIdeale(mockJoueur);
-    removeFromEquipeIdeale(99);
-    expect(equipeIdeale.length).toBe(0);
+  it('🗑️ removeJoueur - supprime un joueur par ID', async () => {
+    (prisma.equipeIdeal.delete as jest.Mock).mockResolvedValue({});
+
+    await service.removeJoueur('123');
+
+    expect(prisma.equipeIdeal.delete).toHaveBeenCalledWith({
+      where: { id: '123' },
+    });
   });
 
-  it('modifie un joueur dans l’équipe idéale sans écraser son id', () => {
-    addToEquipeIdeale(mockJoueur);
-    updateJoueurInEquipeIdeale(99, { fifa_points: 90, name: 'Modifié', id: 100 }); // même si on essaie de modifier l'id
-    expect(equipeIdeale[0].fifa_points).toBe(90);
-    expect(equipeIdeale[0].name).toBe('Modifié');
-    expect(equipeIdeale[0].id).toBe(99); // ✅ id reste intact
+  it('✏️ updateJoueur - met à jour le poste du joueur', async () => {
+    const updated = { id: '123', poste: 2 };
+
+    (prisma.equipeIdeal.update as jest.Mock).mockResolvedValue(updated);
+
+    const result = await service.updateJoueur('123', { poste: 2 });
+
+    expect(prisma.equipeIdeal.update).toHaveBeenCalledWith({
+      where: { id: '123' },
+      data: { poste: 2 },
+    });
+
+    expect(result).toEqual(updated);
   });
 });
