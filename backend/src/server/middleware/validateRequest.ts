@@ -1,28 +1,25 @@
 // src/server/middleware/validateRequest.ts
-
 import { Request, Response, NextFunction } from 'express';
-import { ZodSchema } from 'zod';
+import { ZodSchema, ZodObject } from 'zod';
 
-/**
- * Middleware de validation Zod.
- * @param schema     Schéma Zod à utiliser.
- * @param errorStatus Code HTTP à renvoyer en cas d’échec (par défaut 400).
- */
 export const validateRequest = (
   schema: ZodSchema<any>,
   errorStatus: number = 400
 ) => (req: Request, res: Response, next: NextFunction) => {
-  // 1) On parse directement le corps de la requête
-  const result = schema.safeParse(req.body);
-
-  // 2) Si échec, on renvoie le status configuré et les issues Zod
-  if (!result.success) {
-    return res
-      .status(errorStatus)
-      .json({ errors: result.error.issues });
+  // Si c'est un objet Zod, log ses clés
+  if (schema instanceof ZodObject) {
+    console.log('🛠️ Middleware validateRequest avec ce schéma, clés:', Object.keys(schema.shape));
+  } else {
+    console.log('🛠️ Middleware validateRequest avec schéma non-ZodObject');
   }
 
-  // 3) Sur succès, on remplace req.body par les données validées
+  const result = schema.safeParse(req.body);
+
+  if (!result.success) {
+    console.log('❌ Erreurs de validation:', result.error.issues);
+    return res.status(errorStatus).json({ errors: result.error.issues });
+  }
+
   req.body = result.data;
   next();
 };
