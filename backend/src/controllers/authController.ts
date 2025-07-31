@@ -12,13 +12,15 @@ export const registerUser = async (req: Request, res: Response) => {
   console.log('🔔 registerUser appelé avec body:', req.body);
 
   try {
-    // Ajout des console.log demandés :
     console.log('🧪 registerBackendSchema.shape keys:', Object.keys(registerBackendSchema.shape));
     console.log('🧪 req.body:', req.body);
 
+    // Extraction via schéma sans avatar
     const { email, password, username } = registerBackendSchema.parse(req.body);
+    // Récupération avatar optionnelle hors schéma (car non présent dans registerBackendSchema)
+    const avatar = req.body.avatar;
 
-    // Vérification si l'email existe déjà
+    // Vérification si email déjà utilisé
     const [existing] = await db.query<RowDataPacket[]>(
       'SELECT id FROM users WHERE email = ? LIMIT 1',
       [email]
@@ -27,13 +29,13 @@ export const registerUser = async (req: Request, res: Response) => {
       return res.status(409).json({ error: 'Email déjà utilisé.' });
     }
 
-    // Hash du mot de passe
+    // Hashage du mot de passe
     const hashed = await bcrypt.hash(password, 10);
 
-    // Insertion utilisateur
+    // Insertion dans la base avec avatar (avatar peut être null)
     const [insertResult] = await db.query<ResultSetHeader>(
-      'INSERT INTO users (email, username, password) VALUES (?, ?, ?)',
-      [email, username, hashed]
+      'INSERT INTO users (email, username, password, avatar) VALUES (?, ?, ?, ?)',
+      [email, username, hashed, avatar || null]
     );
 
     return res.status(201).json({
@@ -111,8 +113,9 @@ export const getCurrentUser = async (req: Request, res: Response) => {
   }
 
   try {
+    // ⚠️ Optionnel : ajouter avatar à la sélection si besoin
     const [rows] = await db.query<RowDataPacket[]>(
-      'SELECT id, email, username, role FROM users WHERE id = ? LIMIT 1',
+      'SELECT id, email, username, role, avatar FROM users WHERE id = ? LIMIT 1',
       [payload.userId]
     );
     if (rows.length === 0) {

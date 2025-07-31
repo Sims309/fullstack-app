@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
 import { db } from '../db';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
-import type { MilieuDefensif } from '@shared/types/milieuxDefensifs';
+
+// ✅ Utilise le type dynamiquement depuis l'array existant
+import { milieuxDefensifs } from '@shared/types/milieuxDefensifs';
+type MilieuDefensif = typeof milieuxDefensifs[number];
 
 export const getJoueurById = async (req: Request, res: Response) => {
   const joueurId = Number(req.params.id);
@@ -14,30 +17,15 @@ export const getJoueurById = async (req: Request, res: Response) => {
   try {
     const [results] = await db.query<RowDataPacket[]>(sql, [joueurId]);
 
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'Milieu défensif non trouvé.' });
-    }
+if (results.length === 0) {
+  return res.status(404).json({ error: 'Milieu défensif non trouvé.' });
+}
 
-    const joueur: MilieuDefensif = {
-      id: results[0].id,
-      posteId: results[0].posteId,
-      name: results[0].name,
-      country: results[0].country,
-      image: results[0].image,
-      fifa_points: results[0].fifa_points,
-      biography: results[0].biography,
-      statistics: results[0].statistics,
-      trophees_majeurs: results[0].trophees_majeurs,
-      age: results[0].age,
-      club: results[0].club,
-      nationalite: results[0].nationalite,
-      buts: results[0].buts,
-      passes: results[0].passes,
-      cartons_jaunes: results[0].cartons_jaunes,
-      cartons_rouges: results[0].cartons_rouges
-    };
+// ✅ Cast explicite ici
+const joueur = results[0] as MilieuDefensif;
 
-    res.json({ joueur });
+res.json({ joueur });
+
   } catch (err) {
     console.error('❌ Erreur serveur (getJoueurById):', (err as Error).message);
     res.status(500).json({ error: 'Erreur serveur.' });

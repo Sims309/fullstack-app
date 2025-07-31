@@ -5,11 +5,13 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+  ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),          // ✅ Alias frontend
-      '@shared': path.resolve(__dirname, '../shared') // ✅ Alias vers code partagé
+      '@': path.resolve(__dirname, './src'),
+      '@shared': path.resolve(__dirname, '../shared'),
     },
   },
   server: {
@@ -17,13 +19,16 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
-        secure: false
-        // ✅ On supprime le rewrite pour conserver le /api
+        secure: false,
       },
     },
   },
   build: {
     outDir: 'dist',
-    emptyOutDir: true
+    emptyOutDir: true,
+    sourcemap: true,
+  },
+  esbuild: {
+    jsxInject: `import React from 'react'`,
   },
 });

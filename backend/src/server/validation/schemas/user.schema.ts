@@ -1,15 +1,23 @@
 // src/schemas/user.schema.ts
 import { z } from 'zod';
 
-// 1) Regex stricte pour les emails (empêche les erreurs courantes)
-const emailRegex = /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/;
+// ✅ Validation email Zod native (plus robuste que regex maison)
+const emailField = z
+  .string()
+  .email({ message: 'Email invalide' })
+  .nonempty({ message: 'Email requis' });
 
-// 2) Schéma de base avec tous les champs, mais sans logique refine
+// ✅ Avatar peut être vide ou une URL valide
+const avatarField = z
+  .string()
+  .url({ message: 'URL de l’avatar invalide' })
+  .optional()
+  .or(z.literal(''));
+
+// ──────────────────────────────
+// 🔹 Schéma de base
 const baseRegisterSchema = z.object({
-  email: z
-    .string()
-    .regex(emailRegex, { message: 'Email invalide' })
-    .nonempty({ message: 'Email requis' }),
+  email: emailField,
 
   username: z
     .string()
@@ -24,9 +32,11 @@ const baseRegisterSchema = z.object({
   confirmPassword: z
     .string()
     .nonempty({ message: 'Confirmation du mot de passe requise' }),
+
+  avatar: avatarField,
 });
 
-// 3) Schéma utilisé côté frontend (valide que password === confirmPassword)
+// 🔹 Schéma d'inscription côté frontend (vérifie que les mots de passe correspondent)
 export const registerSchema = baseRegisterSchema.refine(
   (data) => data.password === data.confirmPassword,
   {
@@ -35,17 +45,14 @@ export const registerSchema = baseRegisterSchema.refine(
   }
 );
 
-// 4) Schéma backend : confirmPassword n’est **pas** nécessaire côté API
+// 🔹 Schéma backend (pas besoin de confirmPassword mais on garde avatar)
 export const registerBackendSchema = baseRegisterSchema.omit({
   confirmPassword: true,
 });
 
-// 5) Schéma de login
+// 🔹 Schéma de connexion
 export const loginSchema = z.object({
-  email: z
-    .string()
-    .regex(emailRegex, { message: 'Email invalide' })
-    .nonempty({ message: 'Email requis' }),
+  email: emailField,
 
   password: z
     .string()
@@ -53,8 +60,7 @@ export const loginSchema = z.object({
     .nonempty({ message: 'Mot de passe requis' }),
 });
 
-// 6) Types TypeScript (facultatif mais recommandé)
+// 🔹 Types TypeScript utiles partout
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type RegisterBackendInput = z.infer<typeof registerBackendSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
-

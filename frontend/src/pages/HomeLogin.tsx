@@ -1,119 +1,157 @@
-import React, { useState } from "react";
-import type { FormEvent } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../context/UserContext"; // ✅ Import context
 
-const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+type User = {
+  id: number;
+  email: string;
+  username: string;
+  role: string;
+};
 
+const HomeLogin: React.FC = () => {
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext); // ✅ Utilisation du context
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ Loading state
 
-  const validateEmail = (email: string): boolean => {
-    const re = /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/;
-    return re.test(email.toLowerCase());
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!email.trim() || !password.trim()) {
-      setError("Merci de remplir tous les champs.");
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setError("Merci d'entrer une adresse email valide.");
-      return;
-    }
-
-    setLoading(true);
     setError("");
+    setLoading(true); // ✅ Démarre le chargement
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, username, password }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
-        if (data.errors) {
-          // Gestion des erreurs Zod du serveur
-          const errorMessage = data.errors.map((err: any) => err.message).join(", ");
-          throw new Error(errorMessage);
-        } else {
-          throw new Error(data.error || "Erreur de connexion.");
-        }
+      if (!res.ok) {
+        throw new Error(data.message || "Erreur de connexion");
       }
 
-      // Connexion réussie, redirection
-      navigate("/dashboard");
+      // ✅ Stocker l'utilisateur dans le contexte et localStorage
+      const user: User = data.user;
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // 🎯 MODIFICATION 1 : Redirection vers /accueil au lieu de /
+      navigate("/accueil");
     } catch (err) {
-      if (err instanceof Error) setError(err.message);
-      else setError("Une erreur inconnue est survenue.");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Erreur inconnue");
+      }
     } finally {
-      setLoading(false);
+      setLoading(false); // ✅ Fin du chargement
     }
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "auto", marginTop: 100 }}>
-      <h2>Connexion</h2>
-      <form onSubmit={handleSubmit} noValidate>
-        <div>
-          <label htmlFor="email">Email :</label><br />
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-            autoComplete="username"
-            disabled={loading}
-            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-          />
-        </div>
-        <div style={{ marginTop: 10 }}>
-          <label htmlFor="password">Mot de passe :</label><br />
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-            disabled={loading}
-            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-          />
-        </div>
-        {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
+    <div
+      style={{
+        maxWidth: "400px",
+        margin: "100px auto",
+        padding: "20px",
+        border: "1px solid #ccc",
+        borderRadius: "8px",
+        textAlign: "center",
+        backgroundColor: "#f9f9f9",
+      }}
+    >
+      <h2 style={{ marginBottom: "20px" }}>Connexion</h2>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {loading && <p style={{ color: "#555" }}>Connexion en cours...</p>} {/* ✅ Animation texte */}
+
+      <form
+        onSubmit={handleLogin}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "12px",
+        }}
+      >
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          required
+          onChange={(e) => setEmail(e.target.value)}
+          style={inputStyle}
+        />
+
+        <input
+          type="text"
+          placeholder="Nom d'utilisateur"
+          value={username}
+          required
+          onChange={(e) => setUsername(e.target.value)}
+          style={inputStyle}
+        />
+
+        <input
+          type="password"
+          placeholder="Mot de passe"
+          value={password}
+          required
+          onChange={(e) => setPassword(e.target.value)}
+          style={inputStyle}
+        />
+
         <button
           type="submit"
-          disabled={loading}
           style={{
-            marginTop: 15,
-            width: "100%",
             padding: "10px",
             backgroundColor: "#007bff",
             color: "white",
             border: "none",
             borderRadius: "4px",
-            cursor: loading ? "not-allowed" : "pointer",
+            cursor: "pointer",
+            width: "100%",
           }}
+          disabled={loading} // ✅ Bloque le bouton si chargement
         >
-          {loading ? "Connexion en cours..." : "Se connecter"}
+          {loading ? "Connexion..." : "Se connecter"} {/* ✅ Texte dynamique */}
         </button>
       </form>
-      <div style={{ marginTop: 20, textAlign: "center" }}>
-        <p>Pas encore de compte ? <a href="/register">S'inscrire</a></p>
-      </div>
+
+      <p style={{ marginTop: "15px" }}>
+        Pas de compte ?{" "}
+        {/* 🎯 MODIFICATION 2 : Navigation React Router au lieu de <a href> */}
+        <span 
+          onClick={() => navigate("/register")}
+          style={{ 
+            color: "#007bff", 
+            cursor: "pointer", 
+            textDecoration: "underline" 
+          }}
+        >
+          Créez-en un ici
+        </span>
+      </p>
     </div>
   );
 };
 
-export default LoginPage;
+const inputStyle: React.CSSProperties = {
+  padding: "10px",
+  borderRadius: "4px",
+  border: "1px solid #ccc",
+  width: "100%",
+  maxWidth: "100%",
+  boxSizing: "border-box",
+};
+
+export default HomeLogin;

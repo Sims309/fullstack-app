@@ -3,6 +3,9 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 const RegisterPage: React.FC = () => {
+  // --- Ajout du state avatar ---
+  const [avatar, setAvatar] = useState<string>("");
+
   const [email, setEmail] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -18,6 +21,17 @@ const RegisterPage: React.FC = () => {
     return re.test(email.toLowerCase());
   };
 
+  // --- Optionnel : validation simple de l'URL avatar ---
+  const validateAvatarUrl = (url: string): boolean => {
+    if (!url) return true; // avatar facultatif, ok si vide
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -28,6 +42,11 @@ const RegisterPage: React.FC = () => {
 
     if (!validateEmail(email)) {
       setError("Merci d'entrer une adresse email valide.");
+      return;
+    }
+
+    if (!validateAvatarUrl(avatar)) {
+      setError("Merci d'entrer une URL d'avatar valide.");
       return;
     }
 
@@ -46,12 +65,12 @@ const RegisterPage: React.FC = () => {
     setSuccess("");
 
     try {
-      // ✅ N'envoyer que les champs attendus par le backend (sans confirmPassword)
+      // --- Ajout de avatar dans le body ---
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, username, password }),
+        body: JSON.stringify({ email, username, password, avatar }),
       });
 
       const data = await response.json();
@@ -60,7 +79,6 @@ const RegisterPage: React.FC = () => {
         if (response.status === 409) {
           throw new Error("Cette adresse email est déjà utilisée.");
         } else if (data.errors) {
-          // Gestion des erreurs Zod du serveur
           const errorMessage = data.errors.map((err: any) => err.message).join(", ");
           throw new Error(errorMessage);
         } else {
@@ -70,7 +88,8 @@ const RegisterPage: React.FC = () => {
 
       setSuccess("Inscription réussie ! Vous allez être redirigé vers la page de connexion.");
       setTimeout(() => {
-        navigate("/login");
+        // 🎯 MODIFICATION 1 : Navigation vers / au lieu de /login
+        navigate("/");
       }, 2000);
     } catch (err) {
       if (err instanceof Error) setError(err.message);
@@ -80,69 +99,109 @@ const RegisterPage: React.FC = () => {
     }
   };
 
+  // 🎯 Style commun pour tous les champs input
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "8px",
+    marginTop: "5px",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
+    boxSizing: "border-box"
+  };
+
   return (
-    <div style={{ maxWidth: 400, margin: "auto", marginTop: 100 }}>
-      <h2>Inscription</h2>
+    <div style={{ 
+      maxWidth: 400, 
+      margin: "auto", 
+      marginTop: 100,
+      padding: "20px",
+      border: "1px solid #ccc",
+      borderRadius: "8px",
+      backgroundColor: "#f9f9f9"
+    }}>
+      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Inscription</h2>
+      
       <form onSubmit={handleSubmit} noValidate>
-        <div>
-          <label htmlFor="email">Email :</label><br />
+        
+        {/* Email input */}
+        <div style={{ marginBottom: 15 }}>
+          <label htmlFor="email">Email :</label>
           <input
             id="email"
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            required
-            autoComplete="username"
             disabled={loading}
-            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+            required
+            style={inputStyle}
           />
         </div>
-        <div style={{ marginTop: 10 }}>
-          <label htmlFor="username">Nom d'utilisateur :</label><br />
+
+        {/* Username input */}
+        <div style={{ marginBottom: 15 }}>
+          <label htmlFor="username">Nom d'utilisateur :</label>
           <input
             id="username"
             type="text"
             value={username}
             onChange={e => setUsername(e.target.value)}
-            required
-            autoComplete="username"
             disabled={loading}
-            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+            required
+            style={inputStyle}
           />
         </div>
-        <div style={{ marginTop: 10 }}>
-          <label htmlFor="password">Mot de passe :</label><br />
+
+        {/* Password input */}
+        <div style={{ marginBottom: 15 }}>
+          <label htmlFor="password">Mot de passe :</label>
           <input
             id="password"
             type="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            required
-            autoComplete="new-password"
             disabled={loading}
-            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+            required
+            style={inputStyle}
           />
         </div>
-        <div style={{ marginTop: 10 }}>
-          <label htmlFor="confirmPassword">Confirmer le mot de passe :</label><br />
+
+        {/* Confirm Password input */}
+        <div style={{ marginBottom: 15 }}>
+          <label htmlFor="confirmPassword">Confirmer le mot de passe :</label>
           <input
             id="confirmPassword"
             type="password"
             value={confirmPassword}
             onChange={e => setConfirmPassword(e.target.value)}
-            required
-            autoComplete="new-password"
             disabled={loading}
-            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+            required
+            style={inputStyle}
           />
         </div>
-        {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
-        {success && <p style={{ color: "green", marginTop: 10 }}>{success}</p>}
+
+        {/* Champ avatar ajouté */}
+        <div style={{ marginBottom: 20 }}>
+          <label htmlFor="avatar">Avatar (URL) :</label>
+          <input
+            id="avatar"
+            type="url"
+            value={avatar}
+            onChange={e => setAvatar(e.target.value)}
+            disabled={loading}
+            placeholder="https://exemple.com/monavatar.png"
+            style={inputStyle}
+          />
+        </div>
+
+        {/* Messages d'erreur et de succès */}
+        {error && <p style={{ color: "red", marginBottom: 15, textAlign: "center" }}>{error}</p>}
+        {success && <p style={{ color: "green", marginBottom: 15, textAlign: "center" }}>{success}</p>}
+
+        {/* 🎯 Bouton S'inscrire parfaitement aligné */}
         <button
           type="submit"
           disabled={loading}
           style={{
-            marginTop: 15,
             width: "100%",
             padding: "10px",
             backgroundColor: "#28a745",
@@ -150,13 +209,31 @@ const RegisterPage: React.FC = () => {
             border: "none",
             borderRadius: "4px",
             cursor: loading ? "not-allowed" : "pointer",
+            fontSize: "16px",
+            fontWeight: "500",
+            marginBottom: 20,
+            boxSizing: "border-box"
           }}
         >
           {loading ? "Inscription en cours..." : "S'inscrire"}
         </button>
       </form>
-      <div style={{ marginTop: 20, textAlign: "center" }}>
-        <p>Déjà un compte ? <a href="/login">Se connecter</a></p>
+      
+      <div style={{ textAlign: "center" }}>
+        {/* 🎯 Navigation React Router au lieu de <a href> */}
+        <p style={{ margin: 0 }}>
+          Déjà un compte ?{" "}
+          <span 
+            onClick={() => navigate("/")}
+            style={{ 
+              color: "#007bff", 
+              cursor: "pointer", 
+              textDecoration: "underline" 
+            }}
+          >
+            Se connecter
+          </span>
+        </p>
       </div>
     </div>
   );
