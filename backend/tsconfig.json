@@ -25,7 +25,8 @@
       "@shared/*": ["../shared/*"],
       "@server": ["src/server.ts"],
       "@prismaClient": ["src/server/prismaClient.ts"]
-    }
+    },
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*.ts",

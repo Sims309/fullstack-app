@@ -1,0 +1,12 @@
+.terrain {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 400px;
+  margin: 0 auto;
+  /* ici on met votre image de terrain */
+  background: url('/assets/terrain.jpg') center/cover no-repeat;
+  border: 3px solid white;
+  border-radius: 8px;
+  overflow: hidden;
+}

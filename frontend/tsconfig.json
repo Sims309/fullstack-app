@@ -17,8 +17,14 @@
     "isolatedModules": true,
     "noEmit": false,
     "declaration": true,
-    "declarationMap": true,             // ✅ Pour navigation dans IDE
-    "emitDeclarationOnly": false        // ✅ Pour éviter de n’avoir que les .d.ts
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+
+    // ✅ Ajout important pour résoudre les imports "@/"
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "../dist"],

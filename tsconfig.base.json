@@ -7,7 +7,7 @@
     "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["shared/*"]            // ✅ Corrigé pour pointer vers shared/ complet
+      "@shared/*": ["shared/*"]
     },
 
     "jsx": "react-jsx",
@@ -20,6 +20,6 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
 
-    "types": []                            // 👌 laissé vide pour que les sous-projets définissent leurs propres besoins
+    "types": []
   }
 }

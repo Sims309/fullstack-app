@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../context/UserContext"; // ✅ Import context
+import { UserContext } from "@/contexts/UserContext"; // ✅ Import contexte avec alias @
 
 type User = {
   id: number;

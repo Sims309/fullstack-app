@@ -15,6 +15,7 @@ export default defineConfig({
     },
   },
   server: {
+    host: true, // <-- Ajout précis ici
     proxy: {
       '/api': {
         target: 'http://localhost:5000',

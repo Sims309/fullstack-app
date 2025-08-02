@@ -17,6 +17,7 @@ export interface Joueur {
   club?: string;
   nationalite?: string;
   imageUrl?: string;
+  youtubeUrl?: string;
 }
 
 export function mapSqlRowToJoueur(row: any): Joueur {

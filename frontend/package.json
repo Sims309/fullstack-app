@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "clean": "rimraf dist",
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc -b && vite build",
     "rebuild": "npm run clean && npm run build",
     "lint": "eslint .",
@@ -13,8 +13,10 @@
   },
   "dependencies": {
     "js-cookie": "^3.0.5",
+    "lucide-react": "^0.535.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.3",
     "react-spinners": "^0.17.0"
   },

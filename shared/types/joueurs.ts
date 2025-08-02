@@ -18,6 +18,7 @@ export interface Joueur {
   passes: number;
   cartons_jaunes: number;
   cartons_rouges: number;
+  youtubeUrl?: string;
 }
 
 // Fonction de mapping SQL → Joueur
